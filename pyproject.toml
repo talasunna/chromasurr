@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "chromasurr"
+version = "0.1.0"
+description = "Surrogate modeling and Bayesian calibration of chromatographic processes using CADET and Gaussian Processes."
+authors = ["Tala Al-Sunna <tala.sunna@gmail.com>"]
+license = "MIT"
+readme = "README.rst"
+homepage = "https://github.com/talasunna/chromasurr"
+repository = "https://github.com/talasunna/chromasurr"
+documentation = "https://github.com/talasunna/chromasurr"
+keywords = ["chromatography", "CADET", "surrogate", "Bayesian", "MCMC"]
+
+packages = [
+  { include = "chromasurr", from = "src" }
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.14"
+typer = "*"
+matplotlib = "*"
+scikit-learn = "*"
+emcee = "*"
+numpy = "*"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "*"
+coverage = "*"
+mypy = "*"
+ruff = "*"
+cadet-process = { git = "https://github.com/fau-advanced-separations/CADET-Process.git" }
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+files = "."
+strict = true
+warn_unreachable = true
+warn_no_return = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+allow_untyped_defs = true
+disable_error_code = "attr-defined"
