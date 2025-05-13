@@ -1,5 +1,10 @@
-"""Top-level package for chromasurr."""
+# src/chromasurr/__init__.py
 
-__author__ = """Tala Al-Sunna"""
-__email__ = 'tala.sunna@gmail.com'
-__version__ = '0.1.0'
+from importlib.metadata import version
+__version__ = version("chromasurr")
+
+
+
+#core functions
+#from chromasurr. import
+#from chromasurr. import

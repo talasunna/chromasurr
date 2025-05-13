@@ -1,7 +1,10 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Fri May  9 09:48:06 2025
+import json, matplotlib.pyplot as plt
 
-@author: talasunna
-"""
+def plot_sobol(path="sobol.json", order="ST"):
+    data = json.load(open(path))
+    keys, vals = zip(*data[order].items())
+    plt.bar(keys, vals)
+    plt.xticks(rotation=45, ha="right")
+    plt.ylabel(f"Sobol {order}")
+    plt.tight_layout()
+    plt.show()

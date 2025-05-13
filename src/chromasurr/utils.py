@@ -5,3 +5,4 @@ Created on Thu May  8 10:32:43 2025
 
 @author: talasunna
 """
+"""Miscellaneous one-liners – add as you need."""
