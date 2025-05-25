@@ -97,6 +97,6 @@ def test_extraction():
         c = chromatogram.total_concentration    # concentration vs time
         print(f"Chromatogram {idx}:  {len(t)} points, peak={c.max():.3e}")
 
-    peak, rt = extract(sim, 0)
-    assert peak  > 0
-    assert rt    > 0
+    metrics = extract(sim, 0)
+    assert metrics["peak_width"] > 0
+    assert metrics["retention_time"] > 0
