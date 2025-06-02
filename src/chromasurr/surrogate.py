@@ -24,39 +24,7 @@ def train_multi_surrogate_models(
     n_train: int = 128,
     kernel=None,
     seed: int = 42
-) -> tuple[dict[str, GaussianProcessRegressor], dict[str, np.ndarray],
-           np.ndarray, SALibProblem]:
-    """
-    Train one surrogate model per metric using shared CADET simulations.
-
-    Parameters
-    ----------
-    process : object
-        CADET process template.
-    param_config : dict
-        Parameter name to path inside the process.
-    bounds : dict
-        Parameter name to [min, max] range.
-    metrics : list of str
-        Metric names to extract from the simulation results.
-    n_train : int
-        Number of training samples.
-    kernel : sklearn kernel or None
-        Optional kernel for Gaussian Process. Defaults to RBF.
-    seed : int
-        Random seed for reproducibility.
-
-    Returns
-    -------
-    models : dict[str, GaussianProcessRegressor]
-        One surrogate per metric.
-    Y_trains : dict[str, ndarray]
-        Training outputs per metric.
-    X_train : ndarray
-        Shared training input matrix.
-    problem : SALibProblem
-        Problem dictionary defining the SALib structure.
-    """
+) -> tuple[dict[str, GaussianProcessRegressor], dict[str, np.ndarray], np.ndarray, SALibProblem]:
     np.random.seed(seed)
     problem: SALibProblem = {
         'num_vars': len(param_config),
@@ -106,21 +74,6 @@ def predict_surrogate(
     model: GaussianProcessRegressor,
     X: np.ndarray
 ) -> np.ndarray:
-    """
-    Predict surrogate outputs for new inputs.
-
-    Parameters
-    ----------
-    model : GaussianProcessRegressor
-        Trained surrogate.
-    X : ndarray
-        New input matrix.
-
-    Returns
-    -------
-    ndarray
-        Predicted output vector.
-    """
     return model.predict(X)
 
 
@@ -129,23 +82,6 @@ def run_multi_surrogate_sensitivity_analysis(
     problem: SALibProblem,
     n_samples: int = 1024
 ) -> dict[str, dict[str, np.ndarray]]:
-    """
-    Run SALib Sobol analysis on multiple surrogate models.
-
-    Parameters
-    ----------
-    models : dict
-        Surrogate models keyed by metric name.
-    problem : dict
-        SALib problem definition (names, bounds).
-    n_samples : int
-        Number of base samples (Saltelli will expand it internally).
-
-    Returns
-    -------
-    sobol_results : dict[str, dict]
-        Sensitivity indices per metric.
-    """
     X = sobol.sample(problem, n_samples)
     results = {}
 
@@ -162,3 +98,71 @@ def run_multi_surrogate_sensitivity_analysis(
         }
 
     return results
+
+
+def select_top_parameters_by_sensitivity(
+   sobol_result: dict[str, np.ndarray],
+   param_names: list[str],
+   threshold: float = 0.05
+) -> list[str]:
+     """
+     Select parameter names whose total Sobol index (ST) exceeds a threshold.
+
+     Parameters
+     ----------
+     sobol_result : dict
+         Sobol result for a given metric, as returned by SALib.
+     param_names : list[str]
+         List of parameter names in the original problem.
+     threshold : float
+         Minimum ST value to keep a parameter.
+
+     Returns
+     -------
+     list[str]
+         Selected parameter names.
+     """
+     ST = sobol_result['ST']
+     return [name for name, st in zip(param_names, ST) if st >= threshold]
+
+
+
+def retrain_surrogate_on_selected_parameters(
+    process: object,
+    full_param_config: dict[str, str],
+    bounds: dict[str, list[float]],
+    selected_params: list[str],
+    metrics: list[str],
+    n_train: int = 128
+) -> tuple[dict[str, GaussianProcessRegressor], dict[str, np.ndarray], np.ndarray, SALibProblem]:
+    """
+    Retrain surrogate model using only the selected sensitive parameters.
+
+    Parameters
+    ----------
+    process : object
+        CADET Process object.
+    full_param_config : dict
+        Full parameter config with paths.
+    bounds : dict
+        Parameter bounds.
+    selected_params : list[str]
+        Selected sensitive parameter names.
+    metrics : list[str]
+        Metrics to model.
+    n_train : int
+        Number of training samples.
+
+    Returns
+    -------
+    Same as `train_multi_surrogate_models`, but only for reduced parameter set.
+    """
+    reduced_param_config = {k: full_param_config[k] for k in selected_params}
+    reduced_bounds = {k: bounds[k] for k in selected_params}
+    return train_multi_surrogate_models(
+        process=process,
+        param_config=reduced_param_config,
+        bounds=reduced_bounds,
+        metrics=metrics,
+        n_train=n_train
+    )
