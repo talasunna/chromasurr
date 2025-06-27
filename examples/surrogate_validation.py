@@ -66,23 +66,14 @@ def build_cadet_process():
     return proc
 
 param_config = {
-    'ads_A': 'flow_sheet.column.binding_model.adsorption_rate[0]',
-    'ads_B': 'flow_sheet.column.binding_model.adsorption_rate[1]',
-    'des_A': 'flow_sheet.column.binding_model.desorption_rate[0]',
-    'des_B': 'flow_sheet.column.binding_model.desorption_rate[1]',
-    'cap_A': 'flow_sheet.column.binding_model.capacity[0]',
-    'cap_B': 'flow_sheet.column.binding_model.capacity[1]',
+    'ax_disp': 'flow_sheet.column.axial_dispersion',
+    'porosity': 'flow_sheet.column.total_porosity',
 }
 
 bounds = {
-    'ads_A': [0.01, 0.05],
-    'ads_B': [0.01, 0.05],
-    'des_A': [0.5,  2.0],
-    'des_B': [0.5,  2.0],
-    'cap_A': [50,  150],
-    'cap_B': [50,  150],
+    'ax_disp': [1e-8, 1e-3],
+    'porosity': [0.1, 0.9],
 }
-
 
 def train_surrogate(process):
     sur = Surrogate(
@@ -90,7 +81,7 @@ def train_surrogate(process):
         param_config=param_config,
         bounds=bounds,
         metrics=['retention_time', 'peak_width'],
-        n_train=256,
+        n_train=512,
         seed=42
     )
     print("Training surrogate (this may take a minute)...")
