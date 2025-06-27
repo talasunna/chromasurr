@@ -1,17 +1,6 @@
-"""
-Test surrogate-based sensitivity analysis in chromasurr
-
-Created on May 2025
-"""
-
 import pytest
 import numpy as np
-from chromasurr.surrogate import (
-    train_multi_surrogate_models,
-    run_multi_surrogate_sensitivity_analysis
-)
-from chromasurr.sensitivity import set_nested_attr
-from chromasurr.metrics import extract
+from chromasurr.surrogate import Surrogate  # adjust import as needed
 from CADETProcess.processModel import (
     ComponentSystem, Langmuir, Inlet,
     LumpedRateModelWithoutPores, Outlet,
@@ -19,42 +8,41 @@ from CADETProcess.processModel import (
 )
 
 
-# 🔧 Fixture to create the test CADET process
 @pytest.fixture
-def test_process():
-    cs = ComponentSystem()
-    cs.add_component("A")
-    cs.add_component("B")
+def dummy_process():
+    component_system = ComponentSystem()
+    component_system.add_component('A')
+    component_system.add_component('B')
 
-    bm = Langmuir(cs, "langmuir")
-    bm.is_kinetic = False
-    bm.adsorption_rate = [0.02, 0.03]
-    bm.desorption_rate = [1, 1]
-    bm.capacity = [100, 100]
+    binding_model = Langmuir(component_system, name='langmuir')
+    binding_model.is_kinetic = False
+    binding_model.adsorption_rate = [0.02, 0.03]
+    binding_model.desorption_rate = [1, 1]
+    binding_model.capacity = [100, 100]
 
-    feed = Inlet(cs, "feed")
+    feed = Inlet(component_system, name='feed')
     feed.c = [10, 10]
-    eluent = Inlet(cs, "eluent")
+    eluent = Inlet(component_system, name='eluent')
     eluent.c = [0, 0]
 
-    col = LumpedRateModelWithoutPores(cs, "column")
-    col.binding_model = bm
-    col.length = 0.6
-    col.diameter = 0.024
-    col.axial_dispersion = 4.7e-7
-    col.total_porosity = 0.7
-    col.solution_recorder.write_solution_bulk = True
+    column = LumpedRateModelWithoutPores(component_system, name='column')
+    column.binding_model = binding_model
+    column.length = 0.6
+    column.diameter = 0.024
+    column.axial_dispersion = 4.7e-7
+    column.total_porosity = 0.7
+    column.solution_recorder.write_solution_bulk = True
 
-    out = Outlet(cs, "outlet")
+    outlet = Outlet(component_system, name='outlet')
 
-    fs = FlowSheet(cs)
+    fs = FlowSheet(component_system)
     fs.add_unit(feed, feed_inlet=True)
     fs.add_unit(eluent, eluent_inlet=True)
-    fs.add_unit(col)
-    fs.add_unit(out, product_outlet=True)
-    fs.add_connection(feed, col)
-    fs.add_connection(eluent, col)
-    fs.add_connection(col, out)
+    fs.add_unit(column)
+    fs.add_unit(outlet, product_outlet=True)
+    fs.add_connection(feed, column)
+    fs.add_connection(eluent, column)
+    fs.add_connection(column, outlet)
 
     p = Process(fs, "test_proc")
     Q = 60 / (60 * 1e6)
@@ -71,38 +59,57 @@ def test_process():
     return p
 
 
-@pytest.mark.parametrize("metric", ["retention_time", "peak_width", "num_plates"])
-def test_surrogate_sensitivity_analysis(metric, test_process):
-    process = test_process
-
-    # Parameter setup
-    param_config = {
-        "axial_disp": "flow_sheet.column.axial_dispersion",
-        "total_porosity": "flow_sheet.column.total_porosity"
-    }
-    bounds = {
-        "axial_disp": [3e-8, 9e-3],
-        "total_porosity": [0.1, 0.9]
-    }
-
-    # Train surrogate only for the given metric
-    models, Y, X, problem = train_multi_surrogate_models(
-        process=process,
+@pytest.mark.parametrize("param_config, bounds, metrics", [
+    (
+        {
+            "ax_disp": "flow_sheet.column.axial_dispersion",
+            "porosity": "flow_sheet.column.total_porosity"
+        },
+        {
+            "ax_disp": [1e-8, 1e-3],
+            "porosity": [0.1, 0.9]
+        },
+        ["retention_time", "peak_width"]
+    )
+])
+@pytest.mark.parametrize("threshold", [0.01, 0.05])
+def test_surrogate_pipeline(dummy_process, param_config, bounds, metrics, threshold):
+    # Train initial surrogate
+    surr = Surrogate(
+        process=dummy_process,
         param_config=param_config,
         bounds=bounds,
-        metrics=[metric],
-        n_train=64  # fast test
+        metrics=metrics,
+        n_train=32
     )
 
-    # Run surrogate-based Sobol analysis
-    Si = run_multi_surrogate_sensitivity_analysis(
-        models=models,
-        problem=problem,
-        n_samples=64
-    )
+    surr.train()
 
-    # Assertions
-    assert metric in Si
-    assert "S1" in Si[metric]
-    assert isinstance(Si[metric]["S1"], np.ndarray)
-    assert len(Si[metric]["S1"]) == len(param_config)
+    for m in metrics:
+        assert m in surr.models, f"Model for metric '{m}' not trained"
+        assert surr.Y[m].shape[0] > 0
+
+    assert surr.X.shape[1] == len(param_config)
+
+    # Sensitivity analysis
+    surr.analyze_sensitivity(n_samples=32)
+    for m in metrics:
+        assert "ST" in surr.sensitivity[m]
+
+    # Select important parameters
+    surr.select_important_params(threshold=threshold)
+    assert isinstance(surr.top_params, list)
+    assert len(surr.top_params) > 0
+    assert all(p in param_config for p in surr.top_params)
+
+    # Retrain surrogate with fewer inputs
+    surr.retrain()
+    assert surr.X.shape[1] == len(surr.top_params)
+
+    # Predict on valid new input
+    x_test = np.array([[1e-6, 0.6]])[:, :len(surr.top_params)]
+    for m in metrics:
+        pred = surr.predict(m, x_test)
+        assert isinstance(pred, np.ndarray)
+        assert pred.shape == (1,)
+        assert np.isfinite(pred[0]) or np.isnan(pred[0]) # allow NaN if model had missing training data

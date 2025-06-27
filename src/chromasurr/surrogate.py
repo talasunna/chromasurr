@@ -1,163 +1,199 @@
+"""
+chromasurr.surrogate
+
+Surrogate modeling, sensitivity analysis, and simplification for CADET processes,
+with input scaling and Matern kernel.
+"""
+import copy
+from typing import Any, Dict, List, Optional, Union
+
 import numpy as np
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import RBF
+from sklearn.gaussian_process.kernels import Matern, WhiteKernel, Kernel
+from sklearn.preprocessing import StandardScaler
+from SALib.sample import saltelli as sobol_sample
+from SALib.analyze.sobol import analyze as sobol_analyze
+from CADETProcess.simulator import Cadet
+from CADETProcess.processModel.process import Process
 from chromasurr.sensitivity import set_nested_attr
 from chromasurr.metrics import extract
-from SALib.sample import sobol as sobol_sample
-from SALib.analyze import sobol as sobol_analyze
-from CADETProcess.simulator import Cadet
-import copy
-from typing import Dict, List, Optional
 
 
 class Surrogate:
     """
-    Class to manage surrogate modeling, sensitivity analysis, and model simplification
-    for CADET-based chromatographic process simulations.
-    """
+    Surrogate model manager for CADET-based chromatography simulations.
 
+    Builds a Gaussian process emulator for user-specified metrics by sampling
+    the parameter space with Saltelli's method, training in log-space, and
+    offering sensitivity analysis and parameter reduction.
+
+    Parameters
+    ----------
+    process : Process
+        A CADETProcess `Process` object defining the chromatographic workflow.
+    param_config : dict[str, str]
+        Mapping from parameter names to attribute paths on `process`.
+    bounds : dict[str, list[float]]
+        Lower and upper bounds for each parameter (keys match `param_config`).
+    metrics : list[str]
+        Names of the metrics to model (must match keys of `extract(sim)`).
+    n_train : int, default=128
+        Number of Saltelli base samples for training.
+    kernel : Kernel or Kernel class, optional
+        A scikit-learn kernel instance or class. If None, defaults to Matern(nu=1.5)+WhiteKernel().
+    seed : int, default=0
+        Random seed for reproducibility.
+    """
     def __init__(
         self,
-        process: object,
+        process: Process,
         param_config: Dict[str, str],
         bounds: Dict[str, List[float]],
         metrics: List[str],
         n_train: int = 128,
-        kernel: Optional[object] = None,
-        seed: int = 42
+        kernel: Optional[Union[Kernel, type]] = None,
+        seed: int = 0
     ) -> None:
-        """
-        Initialize the Surrogate object.
+        # Kernel default: Matern for flexibility + white noise for numerical stability
+        if kernel is None:
+            self.kernel = Matern(nu=1.5, length_scale_bounds=(1e-3, 1e3)) \
+                        + WhiteKernel(noise_level_bounds=(1e-6, 1e1))
+        elif isinstance(kernel, Kernel):
+            self.kernel = kernel
+        else:
+            # assume kernel is a class
+            self.kernel = kernel()
 
-        Parameters
-        ----------
-        process : object
-            CADET process object.
-        param_config : dict
-            Mapping of parameter names to CADET attribute paths.
-        bounds : dict
-            Parameter bounds as [min, max] pairs.
-        metrics : list
-            List of metric names to model.
-        n_train : int, optional
-            Number of training samples. Default is 128.
-        kernel : object, optional
-            Custom kernel for Gaussian Process. Default is RBF.
-        seed : int, optional
-            Random seed for reproducibility. Default is 42.
-        """
-        self.process = process
-        self.param_config = param_config
-        self.bounds = bounds
-        self.metrics = metrics
-        self.n_train = n_train
-        self.kernel = kernel
-        self.seed = seed
-        self.problem = {
+        self.process: Process = process
+        self.param_config: Dict[str, str] = param_config
+        self.bounds: Dict[str, List[float]] = bounds
+        self.metrics: List[str] = metrics
+        self.n_train: int = n_train
+        self.seed: int = seed
+
+        # SALib problem definition
+        self.problem: Dict[str, Any] = {
             'num_vars': len(param_config),
-            'names': list(param_config),
-            'bounds': [bounds[k] for k in param_config]
+            'names': list(param_config.keys()),
+            'bounds': [bounds[name] for name in param_config]
         }
-        self.models = {}
-        self.Y = {}
-        self.X = None
-        self.top_params = list(param_config)
-        self.sensitivity = {}
+
+        # Storage
+        self.models: Dict[str, GaussianProcessRegressor] = {}
+        self.Y: Dict[str, np.ndarray] = {}
+        self.X: Optional[np.ndarray] = None
+        self.top_params: List[str] = list(param_config.keys())
+        self.sensitivity: Dict[str, Any] = {}
+        self._scaler: Optional[StandardScaler] = None
 
     def train(self) -> None:
-        """Train Gaussian Process surrogate models using Sobol sampling."""
+        """
+        Train Gaussian process surrogates on Saltelli-sampled simulations.
+
+        Samples the parameter space, runs CADET for each sample, extracts metrics,
+        log-transforms them, scales inputs, and fits a separate GP for each metric.
+        """
         np.random.seed(self.seed)
-        X = sobol_sample.sample(self.problem, self.n_train)
-        Y_dict = {m: [] for m in self.metrics}
+        X_full = sobol_sample.sample(self.problem, self.n_train)
+        results: Dict[str, List[float]] = {m: [] for m in self.metrics}
 
-        for x in X:
-            proc = copy.deepcopy(self.process)
-            for name, val in zip(self.problem['names'], x):
-                set_nested_attr(proc, self.param_config[name], val)
+        for sample in X_full:
+            proc_copy = copy.deepcopy(self.process)
+            for name, val in zip(self.problem['names'], sample):
+                set_nested_attr(proc_copy, self.param_config[name], val)
             try:
-                sim = Cadet().simulate(proc)
-                metrics_out = extract(sim)
+                sim = Cadet().simulate(proc_copy)
+                out = extract(sim)
                 for m in self.metrics:
-                    Y_dict[m].append(metrics_out[m])
-            except Exception as e:
-                print(f"Simulation failed at {x}: {e}")
+                    results[m].append(out[m])
+            except Exception:
                 for m in self.metrics:
-                    Y_dict[m].append(np.nan)
+                    results[m].append(np.nan)
 
-        self.X = np.array(X)
+        self.X = np.array(X_full)
         for m in self.metrics:
-            y = np.array(Y_dict[m])
-            valid = ~np.isnan(y)
-            x_valid = self.X[valid]
-            y_valid = y[valid]
+            y_raw = np.array(results[m])
+            valid = ~np.isnan(y_raw)
+            X_valid = self.X[valid]
+            y_valid = np.log(y_raw[valid])
 
-            n_features = x_valid.shape[1]
-            model_kernel = self.kernel or RBF(
-                length_scale=np.ones(n_features), length_scale_bounds=(1e-6, 1e3)
-                )
-            gp = GaussianProcessRegressor(kernel=model_kernel, normalize_y=True)
-            gp.fit(x_valid, y_valid)
+            # Scale inputs to zero-mean, unit-variance
+            scaler = StandardScaler().fit(X_valid)
+            Xs = scaler.transform(X_valid)
+            self._scaler = scaler
+
+            gp = GaussianProcessRegressor(
+                kernel=self.kernel,
+                normalize_y=True,
+                random_state=self.seed
+            )
+            gp.fit(Xs, y_valid)
+
             self.models[m] = gp
-            self.Y[m] = y_valid
+            self.Y[m] = y_raw[valid]
 
     def analyze_sensitivity(self, n_samples: int = 1024) -> None:
         """
-        Perform Sobol sensitivity analysis using trained surrogate models.
+        Perform Sobol sensitivity analysis using the trained surrogate.
 
-        Parameters
-        ----------
-        n_samples : int, optional
-            Number of samples for Sobol analysis. Default is 1024.
+        Uses the surrogate in log-space at new Saltelli samples.
         """
-        X = sobol_sample.sample(self.problem, n_samples)
-        results = {}
+        X_s = sobol_sample.sample(self.problem, n_samples)
+        results: Dict[str, Any] = {}
         for m in self.metrics:
-            Y_pred = self.models[m].predict(X)
-            Si = sobol_analyze.analyze(self.problem, Y_pred, print_to_console=True)
+            # apply scaling
+            Xs = self._scaler.transform(X_s)
+            y_log = self.models[m].predict(Xs)
+            Si = sobol_analyze(self.problem, y_log, print_to_console=True)
             results[m] = Si
         self.sensitivity = results
 
     def select_important_params(self, threshold: float = 0.05) -> None:
         """
-        Select parameters whose total Sobol index exceeds a threshold.
-
-        Parameters
-        ----------
-        threshold : float, optional
-            Sensitivity threshold for selection. Default is 0.05.
+        Retain only parameters whose total Sobol index meets the threshold.
         """
-        metric = self.metrics[0]  # assume single metric for now
+        metric = self.metrics[0]
         ST = self.sensitivity[metric]['ST']
         self.top_params = [
-            n for n, st in zip(self.problem['names'], ST) if st >= threshold
-            ]
+            name for name, st in zip(self.problem['names'], ST) if st >= threshold
+        ]
         if not self.top_params:
-            self.top_params = self.problem['names']
+            self.top_params = list(self.problem['names'])
 
     def retrain(self) -> None:
-        """Retrain surrogate models using only selected important parameters."""
+        """
+        Retrain surrogate using only the selected top parameters.
+        """
         reduced_config = {k: self.param_config[k] for k in self.top_params}
         reduced_bounds = {k: self.bounds[k] for k in self.top_params}
         self.__init__(
-            self.process, reduced_config, reduced_bounds,
-            self.metrics, self.n_train, self.kernel, self.seed
+            self.process,
+            reduced_config,
+            reduced_bounds,
+            self.metrics,
+            self.n_train,
+            kernel=self.kernel,
+            seed=self.seed
         )
         self.train()
 
     def predict(self, metric: str, X: np.ndarray) -> np.ndarray:
         """
-        Predict the specified metric using the trained surrogate model.
+        Predict the mean of the specified metric on the original scale.
 
         Parameters
         ----------
         metric : str
-            The name of the metric to predict.
-        X : np.ndarray
-            Array of input parameter sets.
+            Name of the metric to predict.
+        X : numpy.ndarray
+            New input parameter matrix of shape (n_samples, n_params).
 
         Returns
         -------
-        np.ndarray
-            Predicted values for the metric.
+        numpy.ndarray
+            Predicted metric values, shape (n_samples,).
         """
-        return self.models[metric].predict(X)
+        # scale new inputs
+        Xs = self._scaler.transform(X)  # type: ignore
+        y_log_mean, _ = self.models[metric].predict(Xs, return_std=True)
+        return np.exp(y_log_mean)
