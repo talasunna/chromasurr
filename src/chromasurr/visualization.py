@@ -46,3 +46,31 @@ def plot_sobol_indices(
     ax.grid(True, linestyle="--", alpha=0.5)
     plt.tight_layout()
     plt.show()
+
+def plot_distributions(
+    self,
+    predictions: Dict[str, np.ndarray],
+    bins: int = 30
+) -> None:
+    """
+    Plot histograms of the propagated metric distributions.
+
+    Parameters
+    ----------
+    predictions : dict
+        Mapping metric name to numpy array of predictions.
+    bins : int, default=30
+        Number of histogram bins.
+
+    Returns
+    -------
+    None
+    """
+    for metric, arr in predictions.items():
+        plt.figure()
+        plt.hist(arr, bins=bins, edgecolor='k', alpha=0.7)
+        plt.title(f"Uncertainty distribution of {metric}")
+        plt.xlabel(metric)
+        plt.ylabel("Count")
+        plt.tight_layout()
+        plt.show()

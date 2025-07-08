@@ -1,9 +1,3 @@
-"""
-chromasurr.surrogate
-
-Surrogate modeling, sensitivity analysis, and simplification for CADET processes,
-with input scaling and Matern kernel.
-"""
 import copy
 from typing import Any, Dict, List, Optional, Union
 
