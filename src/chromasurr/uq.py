@@ -21,6 +21,7 @@ __all__ = [
     "perform_monte_carlo_uq",
 ]
 
+
 def latin_hypercube_sampler(
     bounds: Sequence[tuple[float, float]],
     *,

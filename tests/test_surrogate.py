@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from chromasurr.surrogate import Surrogate  # adjust import as needed
+from chromasurr.surrogate import Surrogate
 from CADETProcess.processModel import (
     ComponentSystem, Langmuir, Inlet,
     LumpedRateModelWithoutPores, Outlet,
