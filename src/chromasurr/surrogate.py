@@ -26,7 +26,13 @@ import numpy as np
 from SALib.analyze.sobol import analyze as sobol_analyze
 from SALib.sample import saltelli as sobol_sample
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import Kernel, Matern, WhiteKernel, RBF, ConstantKernel
+from sklearn.gaussian_process.kernels import (
+    Kernel,
+    Matern,
+    WhiteKernel,
+    RBF,
+    ConstantKernel,
+)
 from sklearn.preprocessing import StandardScaler
 
 from CADETProcess.processModel.process import Process
@@ -84,11 +90,9 @@ class Surrogate:
         self.seed: int = seed
 
         if kernel is None:
-            self.kernel: Kernel = (
-                ConstantKernel(1.0, (1e-3, 1e3)) *
-                RBF(length_scale=1.0, length_scale_bounds=(1e-2, 10.0)) +
-                WhiteKernel(noise_level=1e-3, noise_level_bounds=(1e-4, 1e-1))
-                )
+            self.kernel: Kernel = ConstantKernel(1.0, (1e-3, 1e3)) * RBF(
+                length_scale=1.0, length_scale_bounds=(1e-2, 10.0)
+            ) + WhiteKernel(noise_level=1e-3, noise_level_bounds=(1e-4, 1e-1))
         elif isinstance(kernel, Kernel):
             self.kernel = kernel
         else:
@@ -239,7 +243,7 @@ class Surrogate:
         ST: np.ndarray = self.sensitivity[metric_to_use]["ST"]  # type: ignore[index]
 
         if n_top is not None:
-            idx = np.argsort(ST)[::-1][: n_top]
+            idx = np.argsort(ST)[::-1][:n_top]
             self.top_params = [self.problem["names"][i] for i in idx]
         else:  # threshold mode
             self.top_params = [

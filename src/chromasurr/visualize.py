@@ -22,7 +22,7 @@ def sobol_indices(
     ax: plt.Axes | None = None,
     sort: bool = True,
     show: bool = True,
-    param_config: dict[str, str] | None = None
+    param_config: dict[str, str] | None = None,
 ) -> tuple[plt.Figure, plt.Axes]:
     """
     Scatter plot with error bars for first-order (S1) & total-order (ST) Sobol indices.
@@ -82,12 +82,24 @@ def sobol_indices(
     else:
         fig = ax.figure
 
-    ax.errorbar(range(len(param_names)), S1, yerr=S1_conf, fmt='ro',
-                label="First-order (S1)", markersize=5, capsize=5
-                )
-    ax.errorbar(range(len(param_names)), ST, yerr=ST_conf, fmt='bs',
-                label="Total-order (ST)", markersize=5, capsize=5
-                )
+    ax.errorbar(
+        range(len(param_names)),
+        S1,
+        yerr=S1_conf,
+        fmt="ro",
+        label="First-order (S1)",
+        markersize=5,
+        capsize=5,
+    )
+    ax.errorbar(
+        range(len(param_names)),
+        ST,
+        yerr=ST_conf,
+        fmt="bs",
+        label="Total-order (ST)",
+        markersize=5,
+        capsize=5,
+    )
 
     ax.set_xticks(range(len(param_names)))
     ax.set_xticklabels(param_names, rotation=45, ha="right")
@@ -156,7 +168,7 @@ def posterior(
         ax.set_ylim(ylim)
 
     ax.xaxis.set_major_formatter(ScalarFormatter(useMathText=True))
-    ax.ticklabel_format(style='sci', axis='x', scilimits=(0, 0))
+    ax.ticklabel_format(style="sci", axis="x", scilimits=(0, 0))
 
     ax.set_title(f"Posterior of {param}")
     ax.set_xlabel(param)
@@ -171,14 +183,16 @@ def posterior(
 
 
 def summarize_results(
-    surrogate, metric: str, x_opt: np.ndarray,
+    surrogate,
+    metric: str,
+    x_opt: np.ndarray,
     posterior_df: pd.DataFrame,
-    uq_result: dict
+    uq_result: dict,
 ) -> None:
     """Print summary of calibration + UQ results."""
-    print("\n" + "="*40)
+    print("\n" + "=" * 40)
     print(f"Summary for metric: {metric}")
-    print("="*40)
+    print("=" * 40)
 
     print(f"\nPoint Calibration:\n  x_opt = {x_opt}")
 
@@ -189,7 +203,7 @@ def summarize_results(
         low, high = posterior_df[param].quantile([0.025, 0.975])
         print(
             f"{param: <10} = {mean:.5f} ± {std:.5f}  (95% CI: [{low:.5f}, {high:.5f}])"
-            )
+        )
 
     mean = uq_result["mean"]
     ci = uq_result["quantiles"]

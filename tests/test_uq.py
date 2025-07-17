@@ -11,30 +11,34 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 from chromasurr.calibration import CalibrationResult
 
 from CADETProcess.processModel import (
-    ComponentSystem, Langmuir, Inlet,
-    LumpedRateModelWithoutPores, Outlet,
-    FlowSheet, Process
+    ComponentSystem,
+    Langmuir,
+    Inlet,
+    LumpedRateModelWithoutPores,
+    Outlet,
+    FlowSheet,
+    Process,
 )
 
 
 @pytest.fixture
 def dummy_process():
     component_system = ComponentSystem()
-    component_system.add_component('A')
-    component_system.add_component('B')
+    component_system.add_component("A")
+    component_system.add_component("B")
 
-    binding_model = Langmuir(component_system, name='langmuir')
+    binding_model = Langmuir(component_system, name="langmuir")
     binding_model.is_kinetic = False
     binding_model.adsorption_rate = [0.02, 0.03]
     binding_model.desorption_rate = [1, 1]
     binding_model.capacity = [100, 100]
 
-    feed = Inlet(component_system, name='feed')
+    feed = Inlet(component_system, name="feed")
     feed.c = [10, 10]
-    eluent = Inlet(component_system, name='eluent')
+    eluent = Inlet(component_system, name="eluent")
     eluent.c = [0, 0]
 
-    column = LumpedRateModelWithoutPores(component_system, name='column')
+    column = LumpedRateModelWithoutPores(component_system, name="column")
     column.binding_model = binding_model
     column.length = 0.6
     column.diameter = 0.024
@@ -42,7 +46,7 @@ def dummy_process():
     column.total_porosity = 0.7
     column.solution_recorder.write_solution_bulk = True
 
-    outlet = Outlet(component_system, name='outlet')
+    outlet = Outlet(component_system, name="outlet")
 
     fs = FlowSheet(component_system)
     fs.add_unit(feed, feed_inlet=True)
@@ -72,12 +76,9 @@ def dummy_process():
 def dummy_surrogate(dummy_process):
     param_config = {
         "ax_disp": "flow_sheet.column.axial_dispersion",
-        "porosity": "flow_sheet.column.total_porosity"
+        "porosity": "flow_sheet.column.total_porosity",
     }
-    bounds = {
-        "ax_disp": [1e-8, 1e-3],
-        "porosity": [0.1, 0.9]
-    }
+    bounds = {"ax_disp": [1e-8, 1e-3], "porosity": [0.1, 0.9]}
     metrics = ["retention_time"]
 
     surr = Surrogate(
@@ -85,7 +86,7 @@ def dummy_surrogate(dummy_process):
         param_config=param_config,
         bounds=bounds,
         metrics=metrics,
-        n_train=32
+        n_train=32,
     )
     surr.train()
     surr.analyze_sensitivity(n_samples=32)
@@ -129,10 +130,7 @@ def test_uq_monte_carlo(dummy_surrogate):
         return lb + (ub - lb) * np.random.rand(n, len(bounds))
 
     result = perform_monte_carlo_uq(
-        surrogate=surrogate,
-        sample_input=sample_input,
-        metric=metric,
-        n_samples=256
+        surrogate=surrogate, sample_input=sample_input, metric=metric, n_samples=256
     )
 
     assert "mean" in result

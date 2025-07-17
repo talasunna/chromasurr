@@ -27,16 +27,22 @@ from chromasurr.visualize import (
     summarize_results,
 )
 from CADETProcess.processModel import (
-    ComponentSystem, Langmuir,
-    Inlet, LumpedRateModelWithoutPores, Outlet,
-    FlowSheet, Process,
+    ComponentSystem,
+    Langmuir,
+    Inlet,
+    LumpedRateModelWithoutPores,
+    Outlet,
+    FlowSheet,
+    Process,
 )
 from sklearn.exceptions import ConvergenceWarning
+
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 warnings.filterwarnings("ignore", category=FutureWarning)
+
 
 # ── 2. Build Process ─────────────────────────────────────────────────────────
 def build_process() -> Process:
@@ -90,7 +96,9 @@ def build_process() -> Process:
     proc.cycle_time = 600.0
     return proc
 
+
 # ── 3. Main Pipeline ─────────────────────────────────────────────────────────
+
 
 def main() -> None:
     print("1. Building CADET process...")
@@ -110,7 +118,7 @@ def main() -> None:
     surr = Surrogate(proc, param_config, bounds, metrics, n_train=32)
     surr.train()
     print(f"   > Surrogate trained on {surr.X.shape[0]} samples.")
-    print("    > Y std:", np.std(surr.Y['peak_width']))
+    print("    > Y std:", np.std(surr.Y["peak_width"]))
 
     print("3. Sensitivity analysis...")
     surr.analyze_sensitivity(n_samples=64)
@@ -119,7 +127,9 @@ def main() -> None:
     sobol_results = surr.sensitivity  # Get Sobol results from the surrogate
 
     # Call the sobol_indices function to visualize Sobol indices
-    sobol_indices(sobol_results, metric=metrics[0])  # Visualizing Sobol indices for the first metric
+    sobol_indices(
+        sobol_results, metric=metrics[0]
+    )  # Visualizing Sobol indices for the first metric
 
     print("4. Select important parameters...")
     surr.select_important_params(threshold=0.05)
@@ -135,10 +145,7 @@ def main() -> None:
 
     print("5b. Bayesian calibration...")
     bayes = bayesian_calibration(
-        surr,
-        y_obs={metrics[0]: y_obs},
-        n_walkers=24,
-        n_steps=3000
+        surr, y_obs={metrics[0]: y_obs}, n_walkers=24, n_steps=3000
     )
 
     samples = bayes.extra["chain"]
@@ -150,23 +157,27 @@ def main() -> None:
     # Now use LHS for uncertainty quantification
     print("6. Uncertainty Quantification...")
 
-    lhs_sampler = latin_hypercube_sampler(list(surr.bounds.values()))  # Ensure bounds are in the right format
+    lhs_sampler = latin_hypercube_sampler(
+        list(surr.bounds.values())
+    )  # Ensure bounds are in the right format
 
     uq = perform_monte_carlo_uq(
-        surrogate=surr,
-        sample_input=lhs_sampler,
-        metric=metrics[0],
-        n_samples=1000
+        surrogate=surr, sample_input=lhs_sampler, metric=metrics[0], n_samples=1000
     )
 
-    print(f"   > UQ mean = {uq['mean']}, 95% CI = ({uq['quantiles']['2.5%']}, {uq['quantiles']['97.5%']})")
+    print(
+        f"   > UQ mean = {uq['mean']}, 95% CI = ({uq['quantiles']['2.5%']}, {uq['quantiles']['97.5%']})"
+    )
 
     print("7. Posterior visualization...")
     params = list(surr.bounds)
     for p in params:
-        posterior(samples, param_names=params, param=p,
-                  xlim=(0, 1e-3) if p == 'ax_disp' else (0, 1)
-                  )
+        posterior(
+            samples,
+            param_names=params,
+            param=p,
+            xlim=(0, 1e-3) if p == "ax_disp" else (0, 1),
+        )
 
     print("8. Summary statistics:")
     posterior_df = pd.DataFrame(samples, columns=params)
@@ -175,7 +186,7 @@ def main() -> None:
         metric=metrics[0],
         x_opt=x_opt,
         posterior_df=posterior_df,
-        uq_result=uq
+        uq_result=uq,
     )
 
 

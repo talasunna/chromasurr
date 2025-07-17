@@ -12,6 +12,7 @@ A convenience wrapper :pyfunc:`evaluate` prints a traffic‑light style report s
 users can immediately gauge surrogate quality in notebooks or scripts.
 
 """
+
 from __future__ import annotations
 
 from typing import Dict, Tuple, Literal

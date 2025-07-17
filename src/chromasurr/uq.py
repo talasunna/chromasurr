@@ -79,8 +79,8 @@ def perform_monte_carlo_uq(
     metric: str | None = None,
     n_samples: int = 10_000,
 ) -> (
-    dict[str, dict[str, float | np.ndarray | dict[str, float]]] |
-    dict[str, float | np.ndarray | dict[str, float]]
+    dict[str, dict[str, float | np.ndarray | dict[str, float]]]
+    | dict[str, float | np.ndarray | dict[str, float]]
 ):
     """
     Propagate input uncertainty via Monte Carlo sampling using a surrogate model.

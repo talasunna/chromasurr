@@ -20,16 +20,16 @@ def set_nested_attr(obj: object, attr_path: str, value: float | int) -> None:
     value : float or int
         The value to assign to the attribute.
     """
-    parts = attr_path.split('.')
+    parts = attr_path.split(".")
     for i, part in enumerate(parts[:-1]):
-        if '[' in part:
-            attr, idx = part[:-1].split('[')
+        if "[" in part:
+            attr, idx = part[:-1].split("[")
             obj = getattr(obj, attr)[int(idx)]
         else:
             obj = getattr(obj, part)
     final = parts[-1]
-    if '[' in final:
-        attr, idx = final[:-1].split('[')
+    if "[" in final:
+        attr, idx = final[:-1].split("[")
         getattr(obj, attr)[int(idx)] = value
     else:
         setattr(obj, final, value)
@@ -40,7 +40,7 @@ def run_sensitivity_analysis(
     param_config: dict[str, str],
     bounds: dict[str, list[float]],
     metric_names: list[str] = ["retention_time"],
-    n_samples: int = 512
+    n_samples: int = 512,
 ) -> dict[str, dict[str, np.ndarray]]:
     """
     Perform Sobol sensitivity analysis using a CADETProcess simulation.
@@ -74,9 +74,9 @@ def run_sensitivity_analysis(
         If simulation fails and metric extraction is not possible.
     """
     problem = {
-        'num_vars': len(param_config),
-        'names': list(param_config.keys()),
-        'bounds': [bounds[name] for name in param_config]
+        "num_vars": len(param_config),
+        "names": list(param_config.keys()),
+        "bounds": [bounds[name] for name in param_config],
     }
 
     param_values = saltelli.sample(problem, n_samples)
@@ -85,7 +85,7 @@ def run_sensitivity_analysis(
     for param_set in param_values:
         proc_copy = copy.deepcopy(process)
 
-        for name, val in zip(problem['names'], param_set):
+        for name, val in zip(problem["names"], param_set):
             set_nested_attr(proc_copy, param_config[name], val)
 
         try:
