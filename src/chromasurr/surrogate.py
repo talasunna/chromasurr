@@ -20,20 +20,20 @@ from __future__ import annotations
 
 import copy
 import logging
-from typing import Any, Dict, List, Optional, Sequence, Union, overload
+from typing import Any, Dict, List, Optional, Sequence
 
 import numpy as np
 from SALib.analyze.sobol import analyze as sobol_analyze
 from SALib.sample import saltelli as sobol_sample
 from sklearn.gaussian_process import GaussianProcessRegressor
-from sklearn.gaussian_process.kernels import Kernel, Matern, WhiteKernel
+from sklearn.gaussian_process.kernels import Kernel, Matern, WhiteKernel, RBF, ConstantKernel
 from sklearn.preprocessing import StandardScaler
 
 from CADETProcess.processModel.process import Process
 from CADETProcess.simulator import Cadet
 
-from .metrics import extract  # noqa: F401 – relative import inside package
-from .sensitivity import set_nested_attr
+from chromasurr.metrics import extract
+from chromasurr.sensitivity import set_nested_attr
 
 _logger = logging.getLogger(__name__)
 
@@ -85,9 +85,10 @@ class Surrogate:
 
         if kernel is None:
             self.kernel: Kernel = (
-                Matern(nu=1.5, length_scale_bounds=(1e-3, 1e3))
-                + WhiteKernel(noise_level_bounds=(1e-6, 1e1))
-            )
+                ConstantKernel(1.0, (1e-3, 1e3)) *
+                RBF(length_scale=1.0, length_scale_bounds=(1e-2, 10.0)) +
+                WhiteKernel(noise_level=1e-3, noise_level_bounds=(1e-4, 1e-1))
+                )
         elif isinstance(kernel, Kernel):
             self.kernel = kernel
         else:
@@ -262,6 +263,7 @@ class Surrogate:
         cols = [self.problem["names"].index(p) for p in self.top_params]
 
         self.X = self.X[:, cols]
+        self.bounds = {p: self.bounds[p] for p in self.top_params}
         self.problem["names"] = self.top_params
         self.problem["bounds"] = [self.bounds[p] for p in self.top_params]
         self.problem["num_vars"] = len(self.top_params)
@@ -309,8 +311,9 @@ class Surrogate:
         See e.g. *Crow & Shimizu (1988), Lognormal Distributions*.
         """
         Xs = self._transform(X)
-        _, std = self.models[metric].predict(Xs, return_std=True)
-        var = (np.exp(std**2) - 1.0) * np.exp(2.0 * self.models[metric].predict(Xs) + std**2)
+        mu, std = self.models[metric].predict(Xs, return_std=True)
+        std = np.clip(std, 1e-6, None)  # ✅ Add this line here
+        var = (np.exp(std**2) - 1.0) * np.exp(2.0 * mu + std**2)
         return var
 
     def __repr__(self) -> str:
