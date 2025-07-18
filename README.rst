@@ -9,8 +9,8 @@ chromasurr – Uncertainty-Quantification Toolkit for Chromatography
 - **Vectorized KPI extractor** – Compute retention time, peak width, and number of plates from any simulation in one call (``chromasurr.metrics.extract``)
 - **Global Sobol sensitivity** – One-liner ``run_sensitivity_analysis()`` to rank parameters with Saltelli sampling and automatic metric extraction
 - **Gaussian-process surrogate manager** – The ``Surrogate`` class trains, prunes, and re-trains emulators in log-space; includes built-in sensitivity on the GP itself
-- **Error diagnostics** – 
-- **End-to-end demo** – Full workflow from CADET flowsheet → KPIs → Sobol → surrogate in ``examples/chromasurr_demo.py``
+- **Reusable process builder** – The ``BatchElution`` class provides a ready-to-use CADET process object with configurable parameters like cycle time and feed duration
+- **End-to-end example** – Full demo in ``examples/chromasurr_demo.py`` covering sensitivity analysis, calibration, and UQ
 
 🚀 Quick start
 --------------
@@ -29,7 +29,7 @@ Run the demo in *≈ 60 seconds*:
    # 3. Launch the demo
    python examples/chromasurr_demo.py
 
-The script simulates a batch-elution column in CADET, plots outlet profiles, and walks through KPI extraction, global Sobol sensitivity, and GP surrogate creation.
+This runs a full workflow using a preconfigured ``BatchElution`` process and guides you through GP surrogate modeling, Sobol sensitivity analysis, and Bayesian calibration.
 
 📦 Installation
 ---------------
@@ -38,24 +38,29 @@ The script simulates a batch-elution column in CADET, plots outlet profiles, and
 
    pip install git+https://github.com/talasunna/chromasurr.git
 
-**Note** – CADET-Process ≥ 0.10 must already be compiled on your machine.  
-See the `CADET documentation <https://github.com/fau-cade/cadet>`_ for platform-specific instructions.
+**Note** – CADET-Core must be installed or compiled on your system. See the `CADET-Core Installation Guide <https://cadet.github.io/master/getting_started/installation_core.html>`_ for details.
+
+CADET-Process is automatically installed via pip when installing ``chromasurr``.
 
 🛠️ Usage at a glance
 ---------------------
 
 .. code-block:: python
 
-   from chromasurr.metrics     import extract
+   from chromasurr.process.batch_elution import BatchElution
+   from chromasurr.metrics import extract
    from chromasurr.sensitivity import run_sensitivity_analysis
-   from chromasurr.surrogate   import Surrogate
+   from chromasurr.surrogate import Surrogate
    from CADETProcess.simulator import Cadet
 
-   # 1. Simulate a CADET process object `proc`
-   sim     = Cadet().simulate(proc)
-   metrics = extract(sim)  # {'peak_width': …, 'retention_time': …, 'num_plates': …}
+   # 1. Instantiate a configurable process object
+   proc = BatchElution(cycle_time=600.0, feed_duration=50.0)
 
-   # 2. Global Sobol on either Cadet model (option 1) or surrogate model (option 2). Below is sensitivity analysis on the Cadet model.
+   # 2. Simulate and extract KPIs
+   simulation_results = Cadet().simulate(proc)
+   metrics = extract(simulation_results)
+
+   # 3. Run Sobol sensitivity analysis (on CADET model)
    sobol = run_sensitivity_analysis(
        proc,
        param_config,
@@ -64,7 +69,7 @@ See the `CADET documentation <https://github.com/fau-cade/cadet>`_ for platform-
        n_samples=512
    )
 
-   # 3. Fit & use a Gaussian-process emulator
+   # 4. Train surrogate and predict
    sur = Surrogate(
        proc,
        param_config,
@@ -80,13 +85,13 @@ Sensitivity Analysis Workflow Options
 
 - **Option 1: Run Sensitivity Analysis First, Then Train Surrogate**
 
-  Run sensitivity analysis on the CADET model (or surrogate) using ``run_sensitivity_analysis``, then use results to focus surrogate training on the most important parameters.
+  Use ``run_sensitivity_analysis`` on the CADET model to rank parameters, then train a surrogate focusing on the important ones (based on     the number of parameters you'd like to retain, or on a threshold you can decide).
 
 - **Option 2: Train Surrogate First, Then Run Sensitivity Analysis**
 
-  Train a surrogate using the ``Surrogate`` class, then perform analysis using the built-in ``analyze_sensitivity()`` method.
+  Fit a surrogate with ``Surrogate``, then analyze it with ``analyze_sensitivity()``.
 
-Both workflows allow flexibility in uncertainty quantification and model validation for chromatography.
+Both paths support uncertainty quantification and parameter calibration workflows.
 
 ---
 
@@ -94,7 +99,7 @@ All public functions include **NumPy-style docstrings** and **Python 3.10+ type 
 
 📚 Documentation
 ----------------
-*TBD*
+*TBD – Documentation will be hosted on ReadTheDocs once stabilized.*
 
 🖇️ Project structure
 ---------------------
@@ -103,12 +108,17 @@ All public functions include **NumPy-style docstrings** and **Python 3.10+ type 
 
    chromasurr/
    │   __init__.py
-   │   metrics.py            ← KPI extractor
-   │   sensitivity.py        ← Saltelli driver + helpers
-   │   surrogate.py          ← Surrogate manager
-   │   error_analysis.py     ← Diagnostics utilities
+   │   metrics.py              ← KPI extractor
+   │   sensitivity.py          ← Saltelli driver + helpers
+   │   surrogate.py            ← Surrogate manager
+   │   calibration.py          ← Point + Bayesian calibration
+   │   uq.py                   ← Uncertainty quantification tools
+   │   error_analysis.py       ← Error diagnostics
+   ├── process/
+   │   └── batch_elution.py    ← Configurable CADET Process class
    └── examples/
-       └── chromasurr_demo.py     ← End-to-end workflow
+       └── chromasurr_demo.py  ← End-to-end demo script
+
    docs/
    tests/
 
