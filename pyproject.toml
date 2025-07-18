@@ -22,7 +22,7 @@ scikit-learn   = "*"
 emcee          = "*"
 numpy          = "*"
 SALib          = "*"
-cadet-process  = { git = "https://github.com/fau-advanced-separations/CADET-Process.git" }
+cadet-process  = ">=0.11.1"
 
 [tool.poetry.group.dev.dependencies]
 pytest       = "6.2.4"
