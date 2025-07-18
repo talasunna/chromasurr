@@ -25,10 +25,17 @@ SALib          = "*"
 cadet-process  = { git = "https://github.com/fau-advanced-separations/CADET-Process.git" }
 
 [tool.poetry.group.dev.dependencies]
-pytest  = "*"
-coverage= "*"
-mypy    = "*"
-ruff    = "*"
+pytest       = "6.2.4"
+coverage     = "4.5.4"
+mypy         = "*"
+ruff         = "0.3.5"
+bump2version = "0.5.11"
+wheel        = "0.33.6"
+watchdog     = "0.9.0"
+tox          = "3.14.0"
+Sphinx       = "7.2.6"
+twine        = "5.0.0"
+
 
 [tool.poetry.scripts]
 chromasurr = "chromasurr.cli:app"
