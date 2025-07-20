@@ -56,7 +56,7 @@ class Surrogate:
     process
         Fully configured :class:`CADETProcess.processModel.process.Process`.
     param_config
-        Mapping from **human‑readable** parameter names to *attribute paths*
+        Mapping from *parameter names to *attribute paths*
         on *process*, e.g. ``{"ads_rate_A": "flow_sheet.column.binding_model.adsorption_rate[0]"}``.
     bounds
         Lower/upper bounds for each parameter – same keys/order as
@@ -137,7 +137,7 @@ class Surrogate:
             for name, val in zip(self.problem["names"], sample):
                 set_nested_attr(proc_copy, self.param_config[name], val)
             try:
-                simulation_results = Cadet().simulate(proc_copy)
+                simulation_results = cadet.simulate(proc_copy)
                 out = extract(simulation_results)  # user function
                 for m in self.metrics:
                     raw_results[m].append(float(out[m]))
