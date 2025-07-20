@@ -21,10 +21,11 @@ import warnings
 import numpy as np
 import pandas as pd
 from chromasurr.surrogate import Surrogate
-from chromasurr.calibration import calibrate_surrogate, bayesian_calibration
 from chromasurr.uq import perform_monte_carlo_uq, latin_hypercube_sampler
-from chromasurr.visualize import sobol_indices, posterior, summarize_results
+from chromasurr.visualize import sobol_indices, summarize_results, uq_distribution
 from chromasurr.process.batch_elution import BatchElution
+from sklearn.metrics import mean_squared_error
+from matplotlib import pyplot as plt
 from sklearn.exceptions import ConvergenceWarning
 
 # Silence common warnings for a cleaner demo
@@ -50,13 +51,13 @@ def main() -> None:
     }
     metrics = ["peak_width"]
 
-    print("   > Training GP surrogate on 32 samples...")
-    surr = Surrogate(proc, param_config, bounds, metrics, n_train=32)
+    print("   > Training GP surrogate on 128 samples...")
+    surr = Surrogate(proc, param_config, bounds, metrics, n_train=128)
     surr.train()
     print(f"   > Surrogate trained. Y std = {np.std(surr.Y['peak_width']):.3f}")
 
     print("3. Running global Sobol sensitivity analysis...")
-    surr.analyze_sensitivity(n_samples=64)
+    surr.analyze_sensitivity(n_samples=1024)
     sobol_results = surr.sensitivity
     sobol_indices(sobol_results, metric=metrics[0])
 
@@ -65,44 +66,16 @@ def main() -> None:
     surr.retrain()
     print(f"   > Retained: {surr.top_params}")
 
-    print("5a. Point-estimate calibration...")
-    x_true = surr.X[0]
-    y_obs = surr.predict(metrics[0], x_true.reshape(1, -1))[0]
-    det = calibrate_surrogate(surr, y_obs=y_obs, metric=metrics[0])
-    x_opt = det.x_opt
-    print("   > Calibrated x_opt:", x_opt)
-
-    print("5b. Bayesian calibration with emcee...")
-    bayes = bayesian_calibration(
-        surr, y_obs={metrics[0]: y_obs}, n_walkers=24, n_steps=3000
-    )
-    samples = bayes.extra["chain"]
-    print("   > MCMC samples shape:", samples.shape)
-
-    print("6. Uncertainty quantification via Monte Carlo...")
+    print("5. Uncertainty quantification via Monte Carlo...")
     lhs_sampler = latin_hypercube_sampler(list(surr.bounds.values()))
     uq = perform_monte_carlo_uq(
         surrogate=surr, sample_input=lhs_sampler, metric=metrics[0], n_samples=1000
     )
     print(f"   > UQ 95% CI = ({uq['quantiles']['2.5%']:.3f}, {uq['quantiles']['97.5%']:.3f})")
-
-    print("7. Posterior visualization and summary statistics...")
-    params = list(surr.bounds)
-    posterior_df = pd.DataFrame(samples, columns=params)
-
-    for p in params:
-        posterior(
-            samples,
-            param_names=params,
-            param=p,
-            xlim=(0, 1e-3) if p == "ax_disp" else (0, 1),
-        )
-
+    uq_distribution(uq, metric="peak_width")
     summarize_results(
         surrogate=surr,
         metric=metrics[0],
-        x_opt=x_opt,
-        posterior_df=posterior_df,
         uq_result=uq,
     )
 
