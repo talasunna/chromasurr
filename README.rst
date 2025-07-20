@@ -47,38 +47,57 @@ CADET-Process is automatically installed via pip when installing ``chromasurr``.
 
 .. code-block:: python
 
-   from chromasurr.process.batch_elution import BatchElution
-   from chromasurr.metrics import extract
-   from chromasurr.sensitivity import run_sensitivity_analysis
    from chromasurr.surrogate import Surrogate
-   from CADETProcess.simulator import Cadet
+   from chromasurr.uq import perform_monte_carlo_uq, latin_hypercube_sampler
+   from chromasurr.visualize import sobol_indices, summarize_results, uq_distribution
+   from chromasurr.process.batch_elution import BatchElution
 
    # 1. Instantiate a configurable process object
    proc = BatchElution(cycle_time=600.0, feed_duration=50.0)
 
-   # 2. Simulate and extract KPIs
-   simulation_results = Cadet().simulate(proc)
-   metrics = extract(simulation_results)
+   # 2. Set up parameter configuration and choose metric 
+   param_config = {
+        "ax_disp": "flow_sheet.column.axial_dispersion",
+        "porosity": "flow_sheet.column.total_porosity",
+    }
+    bounds = {
+        "ax_disp": [1e-6, 1e-2],
+        "porosity": [0.35, 0.95],
+    }
+    metrics = ["peak_width"]
 
-   # 3. Run Sobol sensitivity analysis (on CADET model)
-   sobol = run_sensitivity_analysis(
-       proc,
-       param_config,
-       bounds,
-       metric_names=["retention_time", "peak_width"],
-       n_samples=512
-   )
+   # 3. Train surrogate
+   surr = Surrogate(proc, param_config, bounds, metrics, n_train=128)
+   surr.train()
 
-   # 4. Train surrogate and predict
-   sur = Surrogate(
-       proc,
-       param_config,
-       bounds,
-       metrics=["retention_time", "peak_width"],
-       n_train=128
-   )
-   sur.train()
-   rt_pred = sur.predict("retention_time", X_new)
+   # 4. Run sensitivity analysis
+   surr.analyze_sensitivity(n_samples=1024)
+   sobol_results = surr.sensitivity
+
+   # 5. Selection of most important parameters, either based on a threshold or the number of parameters you want, and retrain model based on selection
+   surr.select_important_params(threshold=0.05)
+   surr.retrain()
+
+   # 6. Set up latin hypercube sampler and run uncertainty quantification
+   lhs_sampler = latin_hypercube_sampler(list(surr.bounds.values()))
+   uq = perform_monte_carlo_uq(surrogate=surr, sample_input=lhs_sampler, metric=metrics[0], n_samples=1000)
+
+   # 7. Visualize your analyses: sobol indices, uq distribution, and your results
+  uq_distribution(uq, metric="peak_width")
+
+  sobol_indices(sobol_results, metric=metrics[0])
+
+  summarize_results(
+      surrogate=surr,
+      metric=metrics[0],
+      uq_result=uq,
+  )
+
+
+     
+    
+  
+
 
 Sensitivity Analysis Workflow Options
 --------------------------------------
@@ -111,7 +130,6 @@ All public functions include **NumPy-style docstrings** and **Python 3.10+ type 
    │   metrics.py              ← KPI extractor
    │   sensitivity.py          ← Saltelli driver + helpers
    │   surrogate.py            ← Surrogate manager
-   │   calibration.py          ← Point + Bayesian calibration
    │   uq.py                   ← Uncertainty quantification tools
    │   error_analysis.py       ← Error diagnostics
    ├── process/
