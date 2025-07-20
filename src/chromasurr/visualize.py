@@ -18,7 +18,7 @@ def sobol_indices(
     sobol_results: dict[str, dict[str, np.ndarray]],
     metric: str,
     param_names: list[str] | None = None,
-    figsize: tuple[int, int] = (8, 6),
+    figsize: tuple[int, int] = (10, 9),
     ax: plt.Axes | None = None,
     sort: bool = True,
     show: bool = True,
@@ -116,77 +116,36 @@ def sobol_indices(
     return fig, ax
 
 
-def posterior(
-    posterior_samples: np.ndarray,
-    param_names: list[str],
-    param: str,
-    bins: int = 30,
-    kde: bool = True,
-    xlim: tuple[float, float] | None = None,
-    ylim: tuple[float, float] | None = None,
-    figsize: tuple[int, int] = (6, 4),
-) -> None:
-    """
-    Plot posterior distribution for a single parameter.
+def uq_distribution(
+    uq_result: dict,
+    metric: str,
+    bins: int = 40,
+    figsize: tuple[int, int] = (10, 7),
+    ax: plt.Axes | None = None,
+) -> tuple[plt.Figure, plt.Axes]:
+    """Histogram + KDE + 95 % interval for one UQ output metric."""
+    data = uq_result["y_means"]
+    ci = uq_result["quantiles"]
 
-    Parameters
-    ----------
-    posterior_samples : numpy.ndarray
-        Posterior samples array of shape (n_samples, n_params).
-    param_names : list of str
-        Names of parameters corresponding to columns of posterior_samples.
-    param : str
-        Parameter name to plot.
-    bins : int, default 30
-        Number of histogram bins.
-    kde : bool, default True
-        Whether to overlay a kernel density estimate.
-    xlim : tuple of float, optional
-        Limits for x-axis.
-    ylim : tuple of float, optional
-        Limits for y-axis.
-    figsize : tuple of int, optional
-        Figure size in inches (width, height).
+    if ax is None:
+        fig, ax = plt.subplots(figsize=figsize)
+    else:
+        fig = ax.figure
 
-    Raises
-    ------
-    ValueError
-        If `param` is not in `param_names`.
-    """
-    if param not in param_names:
-        raise ValueError(f"'{param}' not in param_names.")
-
-    idx = param_names.index(param)
-    data = posterior_samples[:, idx]
-
-    fig, ax = plt.subplots(figsize=figsize)
-    sns.histplot(data, bins=bins, kde=kde, ax=ax, stat="density")
-
-    if xlim is not None:
-        ax.set_xlim(xlim)
-    if ylim is not None:
-        ax.set_ylim(ylim)
-
-    ax.xaxis.set_major_formatter(ScalarFormatter(useMathText=True))
-    ax.ticklabel_format(style="sci", axis="x", scilimits=(0, 0))
-
-    ax.set_title(f"Posterior of {param}")
-    ax.set_xlabel(param)
+    sns.histplot(data, bins=bins, kde=True, stat="density", ax=ax)
+    ax.axvline(ci["2.5%"], color="k", ls="--", lw=1, label="95 % CI")
+    ax.axvline(ci["97.5%"], color="k", ls="--", lw=1)
+    ax.set_title(f"Uncertainty distribution: {metric}")
+    ax.set_xlabel(metric)
     ax.set_ylabel("Density")
-
-    median = np.median(data)
-    ax.axvline(median, linestyle="--", label=f"median = {median:.3g}")
     ax.legend()
-
     plt.tight_layout()
-    plt.show()
+    return fig, ax
 
 
 def summarize_results(
     surrogate,
     metric: str,
-    x_opt: np.ndarray,
-    posterior_df: pd.DataFrame,
     uq_result: dict,
 ) -> None:
     """Print summary of calibration + UQ results."""
@@ -194,19 +153,31 @@ def summarize_results(
     print(f"Summary for metric: {metric}")
     print("=" * 40)
 
-    print(f"\nPoint Calibration:\n  x_opt = {x_opt}")
-
-    print("\nPosterior Summary (mean ± std, 95% CI):")
-    for param in posterior_df.columns:
-        mean = posterior_df[param].mean()
-        std = posterior_df[param].std()
-        low, high = posterior_df[param].quantile([0.025, 0.975])
-        print(
-            f"{param: <10} = {mean:.5f} ± {std:.5f}  (95% CI: [{low:.5f}, {high:.5f}])"
-        )
-
     mean = uq_result["mean"]
     ci = uq_result["quantiles"]
     print(f"\nUQ Result for '{metric}':")
     print(f"  Mean: {mean:.5f}")
     print(f"  95% CI: [{ci['2.5%']:.5f}, {ci['97.5%']:.5f}]")
+
+def uq_variance_bar(
+    uq_result: dict,
+    metric: str,
+    ax: plt.Axes | None = None,
+) -> tuple[plt.Figure, plt.Axes]:
+    if ax is None:
+        fig, ax = plt.subplots(figsize=(10, 10))
+    else:
+        fig = ax.figure
+
+    between = uq_result["var_between"]
+    within  = uq_result["var_within"]
+    ax.bar([0], [between], label="Between‑sample", width=0.6)
+    ax.bar([0], [within],  bottom=[between], label="Emulator", width=0.6)
+
+    ax.set_xticks([0])
+    ax.set_xticklabels([metric])
+    ax.set_ylabel("Variance")
+    ax.set_title(f"Variance breakdown – {metric}")
+    ax.legend()
+    plt.tight_layout()
+    return fig, ax
