@@ -19,13 +19,10 @@ Steps:
 # ── 1. Imports ───────────────────────────────────────────────────────────────
 import warnings
 import numpy as np
-import pandas as pd
 from chromasurr.surrogate import Surrogate
 from chromasurr.uq import perform_monte_carlo_uq, latin_hypercube_sampler
 from chromasurr.visualize import sobol_indices, summarize_results, uq_distribution
 from chromasurr.process.batch_elution import BatchElution
-from sklearn.metrics import mean_squared_error
-from matplotlib import pyplot as plt
 from sklearn.exceptions import ConvergenceWarning
 
 # Silence common warnings for a cleaner demo
@@ -36,6 +33,7 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 # ── 2. Main pipeline ─────────────────────────────────────────────────────────
 def main() -> None:
+    """Demonstration function for chromasurr."""
     print("1. Building CADET process model (batch elution)...")
     # Instantiate a reusable, configurable batch elution process
     proc = BatchElution(cycle_time=600.0, feed_duration=60.0, eluent_duration=60.0)
