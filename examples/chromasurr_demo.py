@@ -50,12 +50,12 @@ def main() -> None:
     metrics = ["peak_width"]
 
     print("   > Training GP surrogate on 128 samples...")
-    surr = Surrogate(proc, param_config, bounds, metrics, n_train=128)
+    surr = Surrogate(proc, param_config, bounds, metrics, n_train=512)
     surr.train()
     print(f"   > Surrogate trained. Y std = {np.std(surr.Y['peak_width']):.3f}")
 
     print("3. Running global Sobol sensitivity analysis...")
-    surr.analyze_sensitivity(n_samples=1024)
+    surr.analyze_sensitivity(n_samples=4096)
     sobol_results = surr.sensitivity
     sobol_indices(sobol_results, metric=metrics[0])
 
@@ -67,7 +67,7 @@ def main() -> None:
     print("5. Uncertainty quantification via Monte Carlo...")
     lhs_sampler = latin_hypercube_sampler(list(surr.bounds.values()))
     uq = perform_monte_carlo_uq(
-        surrogate=surr, sample_input=lhs_sampler, metric=metrics[0], n_samples=1000
+        surrogate=surr, sample_input=lhs_sampler, metric=metrics[0], n_samples=20000
     )
     print(f"   > UQ 95% CI = ({uq['quantiles']['2.5%']:.3f}, {uq['quantiles']['97.5%']:.3f})")
     uq_distribution(uq, metric="peak_width")
@@ -76,6 +76,8 @@ def main() -> None:
         metric=metrics[0],
         uq_result=uq,
     )
+
+
 
 
 if __name__ == "__main__":
