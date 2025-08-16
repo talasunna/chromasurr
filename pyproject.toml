@@ -7,7 +7,7 @@ license      = "MIT"
 readme       = "README.rst"
 homepage     = "https://github.com/talasunna/chromasurr"
 repository   = "https://github.com/talasunna/chromasurr"
-documentation= "https://talasunna.github.io/chromasurr"  # ← your live docs
+documentation= "https://talasunna.github.io/chromasurr"
 keywords     = ["chromatography", "CADET", "surrogate", "Bayesian", "MCMC"]
 
 packages = [{ include = "chromasurr", from = "src" }]
