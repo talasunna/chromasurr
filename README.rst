@@ -118,7 +118,7 @@ All public functions include **NumPy-style docstrings** and **Python 3.10+ type 
 
 📚 Documentation
 ----------------
-Docs are hosted on GitHub Pages: <https://talasunna.github.io/chromasurr/>_
+Docs are hosted on GitHub Pages: https://talasunna.github.io/chromasurr/
 
 🖇️ Project structure
 ---------------------
