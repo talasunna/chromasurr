@@ -7,15 +7,13 @@ license      = "MIT"
 readme       = "README.rst"
 homepage     = "https://github.com/talasunna/chromasurr"
 repository   = "https://github.com/talasunna/chromasurr"
-documentation= "https://github.com/talasunna/chromasurr"
+documentation= "https://talasunna.github.io/chromasurr"  # ← your live docs
 keywords     = ["chromatography", "CADET", "surrogate", "Bayesian", "MCMC"]
 
-packages = [
-  { include = "chromasurr", from = "src" }
-]
+packages = [{ include = "chromasurr", from = "src" }]
 
 [tool.poetry.dependencies]
-python         = ">=3.10,<3.14"
+python         = ">=3.12,<4"
 typer          = "*"
 matplotlib     = "*"
 scikit-learn   = "*"
@@ -25,32 +23,32 @@ SALib          = "*"
 cadet-process  = ">=0.11.1"
 
 [tool.poetry.group.dev.dependencies]
-pytest       = "6.2.4"
-coverage     = "4.5.4"
-mypy         = "*"
-ruff         = "0.3.5"
-bump2version = "0.5.11"
-wheel        = "0.33.6"
-watchdog     = "0.9.0"
-tox          = "3.14.0"
-Sphinx       = "7.2.6"
-twine        = "5.0.0"
-
+pytest       = "^8.3"
+coverage     = "^7.6"
+mypy         = "^1.10"
+ruff         = "^0.5"
+black        = "^24.8"
+tox          = "^4.15"
+watchdog     = "^3.0"
+sphinx       = "^8.2"
+twine        = "^5.1"
+wheel        = "^0.43"
+bump2version = "^1.0.1"
 
 [tool.poetry.scripts]
 chromasurr = "chromasurr.cli:app"
 
 [build-system]
-requires    = ["poetry-core"]
+requires      = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
-files             = "."
-strict            = true
-warn_unreachable  = true
-warn_no_return    = true
+files            = "."
+strict           = true
+warn_unreachable = true
+warn_no_return   = true
 
 [[tool.mypy.overrides]]
-module               = "tests.*"
-allow_untyped_defs   = true
-disable_error_code   = "attr-defined"
+module             = "tests.*"
+allow_untyped_defs = true
+disable_error_code = "attr-defined"

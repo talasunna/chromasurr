@@ -1,17 +1,25 @@
 name: CI
-
 on: [push, pull_request]
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-    - run: pip install poetry
-    - run: poetry install
-    - run: poetry run black --check .
-    - run: poetry run mypy .
-    - run: poetry run pytest
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install Poetry
+        run: pipx install poetry==1.8.3
+      - name: Configure Poetry
+        run: poetry config virtualenvs.create false
+      - name: Sync lock & install (incl. dev)
+        run: |
+          poetry lock --no-update
+          poetry install --with dev --no-interaction --no-ansi
+      - name: Black
+        run: poetry run black --check .
+      - name: Mypy
+        run: poetry run mypy .
+      - name: Pytest
+        run: poetry run pytest -q
