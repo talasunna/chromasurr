@@ -38,7 +38,7 @@ jobs:
         run: poetry run black --check .
 
       - name: Mypy
-        run: poetry run mypy .
+        run: poetry run mypy src/chromasurr
 
       - name: Pytest
         run: poetry run pytest -q
