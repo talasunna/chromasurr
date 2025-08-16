@@ -98,28 +98,30 @@
 <span id="chromasurr-sensitivity-module"></span><h1>chromasurr.sensitivity module<a class="headerlink" href="#module-chromasurr.sensitivity" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="chromasurr.sensitivity.run_sensitivity_analysis">
-<span class="sig-prename descclassname"><span class="pre">chromasurr.sensitivity.</span></span><span class="sig-name descname"><span class="pre">run_sensitivity_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['retention_time']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/sensitivity.html#run_sensitivity_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.sensitivity.run_sensitivity_analysis" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">chromasurr.sensitivity.</span></span><span class="sig-name descname"><span class="pre">run_sensitivity_analysis</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">512</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/sensitivity.html#run_sensitivity_analysis"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.sensitivity.run_sensitivity_analysis" title="Link to this definition"></a></dt>
 <dd><p>Perform Sobol sensitivity analysis using a CADETProcess simulation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>process</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><em>object</em></a>) – A CADET <cite>Process</cite> object representing the user’s base model.</p></li>
-<li><p><strong>param_config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>) – Mapping from parameter names to their attribute paths inside the process.</p></li>
-<li><p><strong>bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>]</em><em>]</em>) – Parameter bounds as [min, max] for each variable.</p></li>
-<li><p><strong>metric_names</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em><em>, </em><em>optional</em>) – Names of the performance metrics to extract (default is [“retention_time”]).</p></li>
-<li><p><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – Number of base samples for Saltelli’s method (default is 512).
-The total number of simulations will be <cite>n_samples * (2D + 2)</cite>.</p></li>
+<li><p><strong>process</strong> (<em>Any</em>) – A CADET <code class="docutils literal notranslate"><span class="pre">Process</span></code> object representing the base model (type is untyped
+because CADET does not ship type hints).</p></li>
+<li><p><strong>param_config</strong> (<em>Mapping</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>) – Maps <em>parameter name</em> → <em>attribute path</em> inside the process object.
+Example path: <code class="docutils literal notranslate"><span class="pre">&quot;binding_model.adsorption_rate[0]&quot;</span></code>.</p></li>
+<li><p><strong>bounds</strong> (<em>Mapping</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>]</em><em>]</em>) – Parameter bounds as <code class="docutils literal notranslate"><span class="pre">[min,</span> <span class="pre">max]</span></code> per parameter name.</p></li>
+<li><p><strong>metric_names</strong> (<em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>] or </em><em>None</em><em>, </em><em>optional</em>) – Which metrics to extract via <a class="reference internal" href="chromasurr.metrics.html#chromasurr.metrics.extract" title="chromasurr.metrics.extract"><code class="xref py py-func docutils literal notranslate"><span class="pre">chromasurr.metrics.extract()</span></code></a>.
+Defaults to <code class="docutils literal notranslate"><span class="pre">[&quot;retention_time&quot;]</span></code>.</p></li>
+<li><p><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – Base sample size for Saltelli; total sims ~ <code class="docutils literal notranslate"><span class="pre">n_samples</span> <span class="pre">*</span> <span class="pre">(2D</span> <span class="pre">+</span> <span class="pre">2)</span></code>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>sobol_results</strong> (<em>dict[str, dict[str, np.ndarray]]</em>) – A dictionary mapping metric names to their respective Sobol analysis
-result dictionaries.
-Each contains keys like ‘S1’, ‘ST’, ‘S2’, and their confidence intervals.</p>
+<dd class="field-even"><p><em>dict[str, dict[str, ArrayF | float]]</em> – Mapping <code class="docutils literal notranslate"><span class="pre">metric_name</span></code> → Sobol result dict from SALib. Each dict
+typically contains keys like <code class="docutils literal notranslate"><span class="pre">&quot;S1&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;ST&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;S2&quot;</span></code> and their
+confidence intervals (some values are arrays, some scalars).</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.13)"><strong>KeyError</strong></a> – If a metric name is not found in the extracted result.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If simulation fails and metric extraction is not possible.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#KeyError" title="(in Python v3.13)"><strong>KeyError</strong></a> – If a requested metric is not present in extracted results.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If simulation repeatedly fails and no metrics can be produced.</p></li>
 </ul>
 </dd>
 </dl>
@@ -133,8 +135,8 @@ Each contains keys like ‘S1’, ‘ST’, ‘S2’, and their confidence inter
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>obj</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><em>object</em></a>) – The object whose attribute is to be set.</p></li>
-<li><p><strong>attr_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – A dot-separated string representing the path to the attribute.
-List indexing is supported (e.g., ‘binding_model.adsorption_rate[0]’).</p></li>
+<li><p><strong>attr_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – Dot-separated path to the attribute. Indexing supported, e.g.
+<code class="docutils literal notranslate"><span class="pre">&quot;binding_model.adsorption_rate[0]&quot;</span></code>.</p></li>
 <li><p><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The value to assign to the attribute.</p></li>
 </ul>
 </dd>
@@ -142,6 +144,9 @@ List indexing is supported (e.g., ‘binding_model.adsorption_rate[0]’).</p></
 <dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
 </dd>
 </dl>
+<p class="rubric">Notes</p>
+<p>This walks the object graph following the components in <code class="docutils literal notranslate"><span class="pre">attr_path</span></code>.
+When a component looks like <code class="docutils literal notranslate"><span class="pre">name[index]</span></code>, it indexes the list/sequence.</p>
 </dd></dl>
 
 </section>

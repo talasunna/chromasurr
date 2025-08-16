@@ -77,6 +77,7 @@
              
   <h1>Source code for chromasurr.uq</h1><div class="highlight"><pre>
 <span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">uq.py — forward uncertainty propagation with a trained surrogate.</span>
@@ -86,9 +87,9 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Sequence</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">chromasurr.surrogate</span><span class="w"> </span><span class="kn">import</span> <span class="n">Surrogate</span>
 
@@ -98,6 +99,7 @@
     <span class="s2">&quot;latin_hypercube_sampler&quot;</span><span class="p">,</span>
     <span class="s2">&quot;perform_monte_carlo_uq&quot;</span><span class="p">,</span>
 <span class="p">]</span>
+<span class="n">ArrayF</span> <span class="o">=</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="latin_hypercube_sampler">
@@ -106,7 +108,7 @@
     <span class="n">bounds</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">ArrayF</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Create a Latin hypercube sampler for given parameter bounds.</span>
 
@@ -119,7 +121,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    Callable[[int], np.ndarray]</span>
+<span class="sd">    Callable[[int], ndarray of float]</span>
 <span class="sd">        Function that takes an integer n and returns an (n, len(bounds))</span>
 <span class="sd">        array of sampled inputs.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -127,9 +129,11 @@
     <span class="n">lo</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bounds</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
     <span class="n">span</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bounds</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_sample</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-        <span class="n">u</span> <span class="o">=</span> <span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">)))</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">n</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">/</span> <span class="n">n</span>
-        <span class="k">return</span> <span class="n">lo</span> <span class="o">+</span> <span class="n">u</span> <span class="o">*</span> <span class="n">span</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_sample</span><span class="p">(</span><span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ArrayF</span><span class="p">:</span>
+        <span class="c1"># Latin hypercube in (0,1): stratify each dimension then shuffle rows</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">)</span>
+        <span class="n">u</span> <span class="o">=</span> <span class="p">(</span><span class="n">rng</span><span class="o">.</span><span class="n">random</span><span class="p">((</span><span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">))</span> <span class="o">+</span> <span class="n">rng</span><span class="o">.</span><span class="n">permutation</span><span class="p">(</span><span class="n">n</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">])</span> <span class="o">/</span> <span class="n">n</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">lo</span> <span class="o">+</span> <span class="n">u</span> <span class="o">*</span> <span class="n">span</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">_sample</span></div>
 
@@ -157,13 +161,13 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">perform_monte_carlo_uq</span><span class="p">(</span>
     <span class="o">*</span><span class="p">,</span>
     <span class="n">surrogate</span><span class="p">:</span> <span class="n">Surrogate</span><span class="p">,</span>
-    <span class="n">sample_input</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
+    <span class="n">sample_input</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">int</span><span class="p">],</span> <span class="n">ArrayF</span><span class="p">],</span>
     <span class="n">metrics</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">metric</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10_000</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="p">(</span>
-    <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span>
-    <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
+    <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">ArrayF</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span>
+    <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">ArrayF</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Propagate input uncertainty via Monte Carlo sampling using a surrogate model.</span>
@@ -171,32 +175,25 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    surrogate : Surrogate</span>
-<span class="sd">        Trained surrogate model providing `predict` and `predict_var` methods.</span>
-<span class="sd">    sample_input : Callable[[int], np.ndarray]</span>
-<span class="sd">        Function that generates an array of shape (n_samples, num_vars) of input</span>
-<span class="sd">        samples.</span>
+<span class="sd">        Trained surrogate model providing ``predict`` and ``predict_var``.</span>
+<span class="sd">    sample_input : Callable[[int], ndarray]</span>
+<span class="sd">        Function that generates an array of shape ``(n_samples, num_vars)``</span>
+<span class="sd">        of input samples.</span>
 <span class="sd">    metrics : str or Sequence[str], optional</span>
-<span class="sd">        Metric name or list of metric names to evaluate. If None, uses all</span>
-<span class="sd">        surrogate.metrics.</span>
+<span class="sd">        Metric name or list of metric names to evaluate. If ``None``, uses</span>
+<span class="sd">        ``surrogate.metrics``.</span>
 <span class="sd">    metric : str, optional</span>
-<span class="sd">        Legacy single-metric alias; if provided, `metrics` must be None.</span>
+<span class="sd">        Legacy single-metric alias; if provided, ``metrics`` must be ``None``.</span>
 <span class="sd">    n_samples : int, default 10000</span>
 <span class="sd">        Number of Monte Carlo samples to draw.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict or dict of dict</span>
-<span class="sd">        If `metric` is specified or a single metric, returns a dict with keys:</span>
-<span class="sd">        &#39;mean&#39;, &#39;variance&#39;, &#39;var_between&#39;, &#39;var_within&#39;, &#39;quantiles&#39;, &#39;y_means&#39;,</span>
-<span class="sd">        &#39;y_vars&#39;.</span>
-<span class="sd">        If multiple metrics, returns a mapping from each metric name to its statistics</span>
-<span class="sd">        dict.</span>
-
-<span class="sd">    Raises</span>
-<span class="sd">    ------</span>
-<span class="sd">    ValueError</span>
-<span class="sd">        If both `metric` and `metrics` are provided, or if the sampled input array</span>
-<span class="sd">        does not match the expected shape (n_samples, num_vars).</span>
+<span class="sd">        If a single metric, returns a dict with keys:</span>
+<span class="sd">        ``&#39;mean&#39;``, ``&#39;variance&#39;``, ``&#39;var_between&#39;``, ``&#39;var_within&#39;``,</span>
+<span class="sd">        ``&#39;quantiles&#39;``, ``&#39;y_means&#39;``, ``&#39;y_vars&#39;``.</span>
+<span class="sd">        If multiple metrics, returns a mapping from metric name to its stats.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">metric</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">metrics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Pass either &#39;metric&#39; or &#39;metrics&#39;, not both.&quot;</span><span class="p">)</span>
@@ -207,16 +204,16 @@
         <span class="n">metrics_list</span> <span class="o">=</span> <span class="n">_to_list</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span> <span class="k">if</span> <span class="n">metrics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">surrogate</span><span class="o">.</span><span class="n">metrics</span>
         <span class="n">flatten</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
 
-    <span class="n">X</span> <span class="o">=</span> <span class="n">sample_input</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)</span>
+    <span class="n">X</span><span class="p">:</span> <span class="n">ArrayF</span> <span class="o">=</span> <span class="n">sample_input</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)</span>
     <span class="n">expected_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">surrogate</span><span class="o">.</span><span class="n">problem</span><span class="p">[</span><span class="s2">&quot;num_vars&quot;</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">expected_shape</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sample_input returned array of wrong shape&quot;</span><span class="p">)</span>
 
-    <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span> <span class="o">|</span> <span class="n">ArrayF</span> <span class="o">|</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metrics_list</span><span class="p">:</span>
-        <span class="n">y_means</span> <span class="o">=</span> <span class="n">surrogate</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
-        <span class="n">y_vars</span> <span class="o">=</span> <span class="n">surrogate</span><span class="o">.</span><span class="n">predict_var</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+        <span class="n">y_means</span><span class="p">:</span> <span class="n">ArrayF</span> <span class="o">=</span> <span class="n">surrogate</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
+        <span class="n">y_vars</span><span class="p">:</span> <span class="n">ArrayF</span> <span class="o">=</span> <span class="n">surrogate</span><span class="o">.</span><span class="n">predict_var</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span>
 
         <span class="n">mu</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y_means</span><span class="p">))</span>
         <span class="n">var_between</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">y_means</span><span class="p">,</span> <span class="n">ddof</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>

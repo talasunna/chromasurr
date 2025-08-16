@@ -16,6 +16,7 @@
       <script src="../_static/documentation_options.js?v=01f34227"></script>
       <script src="../_static/doctools.js?v=9bcbadda"></script>
       <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -96,57 +97,57 @@
              
   <section id="module-chromasurr.surrogate">
 <span id="chromasurr-surrogate-module"></span><h1>chromasurr.surrogate module<a class="headerlink" href="#module-chromasurr.surrogate" title="Link to this heading"></a></h1>
-<p>surrogate.py – Gaussian‑process replacement of CADET simulations.</p>
+<p>surrogate.py – Gaussian-process replacement of CADET simulations.</p>
 <p>This module provides the <a class="reference internal" href="#chromasurr.surrogate.Surrogate" title="chromasurr.surrogate.Surrogate"><code class="xref py py-class docutils literal notranslate"><span class="pre">Surrogate</span></code></a> class that can</p>
 <ol class="arabic simple">
 <li><p>sample the CADET parameter space with Saltelli’s method,</p></li>
-<li><p>train one Gaussian‑process (GP) emulator <strong>per KPI</strong> in log‑space,</p></li>
+<li><p>train one Gaussian-process (GP) emulator <strong>per KPI</strong> in log-space,</p></li>
 <li><p>perform <em>cheap</em> Sobol sensitivity analysis <em>on</em> the GP,</p></li>
-<li><p>keep only the most important parameters (user‑defined criterion), and</p></li>
+<li><p>keep only the most important parameters (user-defined criterion), and</p></li>
 <li><p>retrain <strong>without rerunning CADET</strong>.</p></li>
 </ol>
 <p>It also exposes <a class="reference internal" href="#chromasurr.surrogate.Surrogate.predict" title="chromasurr.surrogate.Surrogate.predict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Surrogate.predict()</span></code></a> and
 <a class="reference internal" href="#chromasurr.surrogate.Surrogate.predict_var" title="chromasurr.surrogate.Surrogate.predict_var"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Surrogate.predict_var()</span></code></a> so you can propagate uncertainty later
 (e.g. with <code class="docutils literal notranslate"><span class="pre">chromasurr.uq.perform_monte_carlo_uq</span></code>).</p>
-<p>All public methods carry Numpy‑style docstrings and full Python ≥3.10
-static type hints.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="chromasurr.surrogate.Surrogate">
 <em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chromasurr.surrogate.</span></span><span class="sig-name descname"><span class="pre">Surrogate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/surrogate.html#Surrogate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.surrogate.Surrogate" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>Gaussian‑process surrogate for a CADET chromatography workflow.</p>
+<p>Gaussian-process surrogate for a CADET chromatography workflow.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>process</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></span>) – Fully configured <code class="xref py py-class docutils literal notranslate"><span class="pre">CADETProcess.processModel.process.Process</span></code>.</p></li>
-<li><p><strong>param_config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Mapping from <em>parameter names to *attribute paths</em>
-on <em>process</em>, e.g. <code class="docutils literal notranslate"><span class="pre">{&quot;ads_rate_A&quot;:</span> <span class="pre">&quot;flow_sheet.column.binding_model.adsorption_rate[0]&quot;}</span></code>.</p></li>
-<li><p><strong>bounds</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]</span>) – Lower/upper bounds for each parameter – same keys/order as
-<em>param_config</em>.</p></li>
-<li><p><strong>metrics</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Keys returned by <a class="reference internal" href="chromasurr.metrics.html#chromasurr.metrics.extract" title="chromasurr.metrics.extract"><code class="xref py py-func docutils literal notranslate"><span class="pre">chromasurr.metrics.extract()</span></code></a> to emulate.</p></li>
-<li><p><strong>n_train</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Saltelli <em>base</em> sample size.  Total sims ≈ <code class="docutils literal notranslate"><span class="pre">n_train</span> <span class="pre">×</span> <span class="pre">(2D</span> <span class="pre">+</span> <span class="pre">2)</span></code>.</p></li>
-<li><p><strong>kernel</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Kernel</span></code> | <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – scikit‑learn kernel or class.  Defaults to <code class="docutils literal notranslate"><span class="pre">Matern(1.5)+White</span></code>.</p></li>
-<li><p><strong>seed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – RNG seed (NumPy <em>and</em> scikit‑learn).</p></li>
+<li><p><strong>process</strong> (<em>CADETProcess.processModel.process.Process</em>) – Fully configured process model to emulate.</p></li>
+<li><p><strong>param_config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>) – Mapping from <em>parameter names</em> to <em>attribute paths</em> on <code class="docutils literal notranslate"><span class="pre">process</span></code>,
+e.g. <code class="docutils literal notranslate"><span class="pre">{&quot;ads_rate_A&quot;:</span> <span class="pre">&quot;flow_sheet.column.binding_model.adsorption_rate[0]&quot;}</span></code>.</p></li>
+<li><p><strong>bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>]</em><em>]</em>) – Lower/upper bounds for each parameter – same keys/order as <code class="docutils literal notranslate"><span class="pre">param_config</span></code>.</p></li>
+<li><p><strong>metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.13)"><em>list</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em>) – Keys returned by <a class="reference internal" href="chromasurr.metrics.html#chromasurr.metrics.extract" title="chromasurr.metrics.extract"><code class="xref py py-func docutils literal notranslate"><span class="pre">chromasurr.metrics.extract()</span></code></a> to emulate.</p></li>
+<li><p><strong>n_train</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>default=128</em>) – Saltelli <em>base</em> sample size.  Total sims ≈ <code class="docutils literal notranslate"><span class="pre">n_train</span> <span class="pre">×</span> <span class="pre">(2D</span> <span class="pre">+</span> <span class="pre">2)</span></code>.</p></li>
+<li><p><strong>kernel</strong> (<em>Kernel</em><em> | </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><em>type</em></a><em> | </em><em>None</em><em>, </em><em>optional</em>) – scikit-learn kernel instance or class. Defaults to <code class="docutils literal notranslate"><span class="pre">Matern(1.5)+White</span></code>.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>default=0</em>) – RNG seed (NumPy <em>and</em> scikit-learn).</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="chromasurr.surrogate.Surrogate.analyze_sensitivity">
 <span class="sig-name descname"><span class="pre">analyze_sensitivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_to_console</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/surrogate.html#Surrogate.analyze_sensitivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.surrogate.Surrogate.analyze_sensitivity" title="Link to this definition"></a></dt>
-<dd><p>Global Sobol indices <em>via</em> the trained GP.</p>
+<dd><p>Compute global Sobol indices <strong>via</strong> the trained GP.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>n_samples</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Saltelli base sample size for the surrogate evaluation.</p></li>
-<li><p><strong>metric</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – If <em>None</em> analyse <strong>all</strong> metrics and store under
-<a href="#id1"><span class="problematic" id="id2">:pyattr:`sensitivity`</span></a>; otherwise analyse only <em>metric</em>.</p></li>
-<li><p><strong>log_space</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Analyse on the GP training scale (<code class="docutils literal notranslate"><span class="pre">True</span></code>) or exponentiate the
+<li><p><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>default=1024</em>) – Saltelli base sample size for the surrogate evaluation.</p></li>
+<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">None</span></code> analyse <strong>all</strong> metrics and store under
+<a href="#id1"><span class="problematic" id="id2">:pyattr:`sensitivity`</span></a>; otherwise analyse only the given metric.</p></li>
+<li><p><strong>log_space</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>default=True</em>) – Analyse on the GP training scale (<code class="docutils literal notranslate"><span class="pre">True</span></code>) or exponentiate the
 predictions first (<code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
-<li><p><strong>print_to_console</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Forward <em>SALib</em>’s textual summary to <em>stdout</em>?</p></li>
+<li><p><strong>print_to_console</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>default=False</em>) – Forward SALib’s textual summary to <em>stdout</em>?</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.13)"><strong>RuntimeError</strong></a> – If the surrogate has not been trained yet.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>
@@ -154,16 +155,16 @@ predictions first (<code class="docutils literal notranslate"><span class="pre">
 <dl class="py method">
 <dt class="sig sig-object py" id="chromasurr.surrogate.Surrogate.predict">
 <span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/surrogate.html#Surrogate.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.surrogate.Surrogate.predict" title="Link to this definition"></a></dt>
-<dd><p>Predict <strong>mean</strong> of <em>metric</em> on original scale.</p>
+<dd><p>Predict <strong>mean</strong> of a KPI on the original scale.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>metric</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Which KPI to return.</p></li>
-<li><p><strong>X</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">n_params)</span></code>.</p></li>
+<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – Which KPI (metric name) to return.</p></li>
+<li><p><strong>X</strong> (<em>ndarray</em><em>, </em><em>shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_params</em><em>)</em>) – Input design.</p></li>
 </ul>
 </dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></p>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em> – Mean predictions on the original (exp) scale.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -171,15 +172,20 @@ predictions first (<code class="docutils literal notranslate"><span class="pre">
 <dl class="py method">
 <dt class="sig sig-object py" id="chromasurr.surrogate.Surrogate.predict_var">
 <span class="sig-name descname"><span class="pre">predict_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/surrogate.html#Surrogate.predict_var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.surrogate.Surrogate.predict_var" title="Link to this definition"></a></dt>
-<dd><p>Predict <strong>variance</strong> of <em>metric</em> (original scale).</p>
-<p>Formula for a log‑normal variable <code class="docutils literal notranslate"><span class="pre">Y</span> <span class="pre">=</span> <span class="pre">exp(Z),</span>&#160; <span class="pre">Z~N(μ,</span> <span class="pre">σ²)</span></code></p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Var[Y] = (e^{σ²} - 1) · e^{2μ + σ²}
-</pre></div>
-</div>
-<p>See e.g. <em>Crow &amp; Shimizu (1988), Lognormal Distributions</em>.</p>
+<dd><p>Predict the <strong>variance</strong> of a KPI on the original scale.</p>
+<p>The GP is trained on log-responses.  For a log-normal variable
+<code class="docutils literal notranslate"><span class="pre">Y</span> <span class="pre">=</span> <span class="pre">exp(Z)</span></code>, with <code class="docutils literal notranslate"><span class="pre">Z</span> <span class="pre">~</span> <span class="pre">N(μ,</span> <span class="pre">σ²)</span></code>, the variance is</p>
+<div class="math notranslate nohighlight">
+\[\operatorname{Var}[Y] = (e^{\sigma^2} - 1)\, e^{2\mu + \sigma^2}\]</div>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – Which KPI (metric name) to return variance for.</p></li>
+<li><p><strong>X</strong> (<em>ndarray</em><em>, </em><em>shape</em><em> (</em><em>n_samples</em><em>, </em><em>n_params</em><em>)</em>) – Input design.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>ndarray</em> – Variance predictions on the original scale.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -187,7 +193,7 @@ predictions first (<code class="docutils literal notranslate"><span class="pre">
 <dl class="py method">
 <dt class="sig sig-object py" id="chromasurr.surrogate.Surrogate.retrain">
 <span class="sig-name descname"><span class="pre">retrain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/surrogate.html#Surrogate.retrain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.surrogate.Surrogate.retrain" title="Link to this definition"></a></dt>
-<dd><p>Retrain <strong>without</strong> new CADET runs, using only <em>top_params</em>.</p>
+<dd><p>Retrain <strong>without</strong> new CADET runs, using only <code class="docutils literal notranslate"><span class="pre">top_params</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
@@ -202,8 +208,21 @@ predictions first (<code class="docutils literal notranslate"><span class="pre">
 <p>Exactly <strong>one</strong> of <em>threshold</em> or <em>n_top</em> can be given.  The default
 keeps parameters with <code class="docutils literal notranslate"><span class="pre">ST</span> <span class="pre">≥</span> <span class="pre">0.05</span></code> <em>for the first metric</em>.</p>
 <dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><em>list[str]</em> – The retained parameter names.</p>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Which metric’s indices to use; defaults to the first metric.</p></li>
+<li><p><strong>threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em> or </em><em>None</em><em>, </em><em>default=0.05</em>) – Keep parameters with <code class="docutils literal notranslate"><span class="pre">ST</span> <span class="pre">&gt;=</span> <span class="pre">threshold</span></code>.</p></li>
+<li><p><strong>n_top</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – If provided, keep exactly the top-<code class="docutils literal notranslate"><span class="pre">n_top</span></code> parameters by <code class="docutils literal notranslate"><span class="pre">ST</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>list[str]</em> – The retained parameter names.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If both or neither of <code class="docutils literal notranslate"><span class="pre">threshold</span></code> and <code class="docutils literal notranslate"><span class="pre">n_top</span></code> are provided.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.13)"><strong>RuntimeError</strong></a> – If <a class="reference internal" href="#chromasurr.surrogate.Surrogate.analyze_sensitivity" title="chromasurr.surrogate.Surrogate.analyze_sensitivity"><code class="xref py py-meth docutils literal notranslate"><span class="pre">analyze_sensitivity()</span></code></a> has not been called yet.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -222,8 +241,14 @@ on the <strong>intersection</strong> of rows valid for <em>all</em> metrics, and
 on <code class="docutils literal notranslate"><span class="pre">log(y)</span></code> for each metric.</p></li>
 </ol>
 <dl class="field-list simple">
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#RuntimeError" title="(in Python v3.13)"><strong>RuntimeError</strong></a> – If no valid simulations are available to train on.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If a particular metric has no finite data.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
 </dd>
 </dl>
 </dd></dl>

@@ -76,12 +76,27 @@
            <div itemprop="articleBody">
              
   <h1>Source code for chromasurr.sensitivity</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Mapping</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">TypedDict</span>
+
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">SALib.sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">saltelli</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numpy.typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">NDArray</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">SALib.analyze</span><span class="w"> </span><span class="kn">import</span> <span class="n">sobol</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">SALib.sample</span><span class="w"> </span><span class="kn">import</span> <span class="n">saltelli</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">CADETProcess.simulator</span><span class="w"> </span><span class="kn">import</span> <span class="n">Cadet</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">chromasurr.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">extract</span>
+
+<span class="n">ArrayF</span> <span class="o">=</span> <span class="n">NDArray</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">]</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_ProblemSpec</span><span class="p">(</span><span class="n">TypedDict</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;TypedDict for SALib problem specification.&quot;&quot;&quot;</span>
+
+    <span class="n">num_vars</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="n">bounds</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span>
 
 
 <div class="viewcode-block" id="set_nested_attr">
@@ -95,13 +110,18 @@
 <span class="sd">    obj : object</span>
 <span class="sd">        The object whose attribute is to be set.</span>
 <span class="sd">    attr_path : str</span>
-<span class="sd">        A dot-separated string representing the path to the attribute.</span>
-<span class="sd">        List indexing is supported (e.g., &#39;binding_model.adsorption_rate[0]&#39;).</span>
+<span class="sd">        Dot-separated path to the attribute. Indexing supported, e.g.</span>
+<span class="sd">        ``&quot;binding_model.adsorption_rate[0]&quot;``.</span>
 <span class="sd">    value : float or int</span>
 <span class="sd">        The value to assign to the attribute.</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This walks the object graph following the components in ``attr_path``.</span>
+<span class="sd">    When a component looks like ``name[index]``, it indexes the list/sequence.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">parts</span> <span class="o">=</span> <span class="n">attr_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">part</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
         <span class="k">if</span> <span class="s2">&quot;[&quot;</span> <span class="ow">in</span> <span class="n">part</span><span class="p">:</span>
             <span class="n">attr</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">part</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">)</span>
             <span class="n">obj</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">attr</span><span class="p">)[</span><span class="nb">int</span><span class="p">(</span><span class="n">idx</span><span class="p">)]</span>
@@ -119,75 +139,91 @@
 <div class="viewcode-block" id="run_sensitivity_analysis">
 <a class="viewcode-back" href="../../api/chromasurr.sensitivity.html#chromasurr.sensitivity.run_sensitivity_analysis">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">run_sensitivity_analysis</span><span class="p">(</span>
-    <span class="n">process</span><span class="p">:</span> <span class="nb">object</span><span class="p">,</span>
-    <span class="n">param_config</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
-    <span class="n">bounds</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
-    <span class="n">metric_names</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;retention_time&quot;</span><span class="p">],</span>
+    <span class="n">process</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+    <span class="n">param_config</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+    <span class="n">bounds</span><span class="p">:</span> <span class="n">Mapping</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">float</span><span class="p">]],</span>
+    <span class="n">metric_names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">n_samples</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">512</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]]:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ArrayF</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Perform Sobol sensitivity analysis using a CADETProcess simulation.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    process : object</span>
-<span class="sd">        A CADET `Process` object representing the user&#39;s base model.</span>
-<span class="sd">    param_config : dict[str, str]</span>
-<span class="sd">        Mapping from parameter names to their attribute paths inside the process.</span>
-<span class="sd">    bounds : dict[str, list[float]]</span>
-<span class="sd">        Parameter bounds as [min, max] for each variable.</span>
-<span class="sd">    metric_names : list[str], optional</span>
-<span class="sd">        Names of the performance metrics to extract (default is [&quot;retention_time&quot;]).</span>
+<span class="sd">    process : Any</span>
+<span class="sd">        A CADET ``Process`` object representing the base model (type is untyped</span>
+<span class="sd">        because CADET does not ship type hints).</span>
+<span class="sd">    param_config : Mapping[str, str]</span>
+<span class="sd">        Maps *parameter name* → *attribute path* inside the process object.</span>
+<span class="sd">        Example path: ``&quot;binding_model.adsorption_rate[0]&quot;``.</span>
+<span class="sd">    bounds : Mapping[str, Sequence[float]]</span>
+<span class="sd">        Parameter bounds as ``[min, max]`` per parameter name.</span>
+<span class="sd">    metric_names : Sequence[str] or None, optional</span>
+<span class="sd">        Which metrics to extract via :py:func:`chromasurr.metrics.extract`.</span>
+<span class="sd">        Defaults to ``[&quot;retention_time&quot;]``.</span>
 <span class="sd">    n_samples : int, optional</span>
-<span class="sd">        Number of base samples for Saltelli&#39;s method (default is 512).</span>
-<span class="sd">        The total number of simulations will be `n_samples * (2D + 2)`.</span>
+<span class="sd">        Base sample size for Saltelli; total sims ~ ``n_samples * (2D + 2)``.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    sobol_results : dict[str, dict[str, np.ndarray]]</span>
-<span class="sd">        A dictionary mapping metric names to their respective Sobol analysis</span>
-<span class="sd">        result dictionaries.</span>
-<span class="sd">        Each contains keys like &#39;S1&#39;, &#39;ST&#39;, &#39;S2&#39;, and their confidence intervals.</span>
+<span class="sd">    dict[str, dict[str, ArrayF | float]]</span>
+<span class="sd">        Mapping ``metric_name`` → Sobol result dict from SALib. Each dict</span>
+<span class="sd">        typically contains keys like ``&quot;S1&quot;``, ``&quot;ST&quot;``, ``&quot;S2&quot;`` and their</span>
+<span class="sd">        confidence intervals (some values are arrays, some scalars).</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
 <span class="sd">    KeyError</span>
-<span class="sd">        If a metric name is not found in the extracted result.</span>
+<span class="sd">        If a requested metric is not present in extracted results.</span>
 <span class="sd">    ValueError</span>
-<span class="sd">        If simulation fails and metric extraction is not possible.</span>
+<span class="sd">        If simulation repeatedly fails and no metrics can be produced.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">problem</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="c1"># Default metrics without using a mutable default argument</span>
+    <span class="k">if</span> <span class="n">metric_names</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">metric_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;retention_time&quot;</span><span class="p">]</span>
+
+    <span class="n">problem</span><span class="p">:</span> <span class="n">_ProblemSpec</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;num_vars&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">param_config</span><span class="p">),</span>
         <span class="s2">&quot;names&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">param_config</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
-        <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">bounds</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">param_config</span><span class="p">],</span>
+        <span class="s2">&quot;bounds&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">bounds</span><span class="p">[</span><span class="n">name</span><span class="p">])</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">param_config</span><span class="p">],</span>
     <span class="p">}</span>
 
-    <span class="n">param_values</span> <span class="o">=</span> <span class="n">saltelli</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
-    <span class="n">metric_results</span> <span class="o">=</span> <span class="p">{</span><span class="n">m</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metric_names</span><span class="p">}</span>
+    <span class="c1"># SALib returns an ndarray of shape (N, D)</span>
+    <span class="n">param_values</span><span class="p">:</span> <span class="n">ArrayF</span> <span class="o">=</span> <span class="n">saltelli</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">n_samples</span><span class="p">)</span>
+
+    <span class="c1"># Collect raw metric values as lists, then convert to arrays</span>
+    <span class="n">metric_results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="n">m</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metric_names</span><span class="p">}</span>
 
     <span class="k">for</span> <span class="n">param_set</span> <span class="ow">in</span> <span class="n">param_values</span><span class="p">:</span>
         <span class="n">proc_copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">process</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">problem</span><span class="p">[</span><span class="s2">&quot;names&quot;</span><span class="p">],</span> <span class="n">param_set</span><span class="p">):</span>
-            <span class="n">set_nested_attr</span><span class="p">(</span><span class="n">proc_copy</span><span class="p">,</span> <span class="n">param_config</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="n">val</span><span class="p">)</span>
+        <span class="c1"># zip() needs well-typed iterables → .tolist() gives list[float]</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">problem</span><span class="p">[</span><span class="s2">&quot;names&quot;</span><span class="p">],</span> <span class="n">param_set</span><span class="o">.</span><span class="n">tolist</span><span class="p">()):</span>
+            <span class="n">set_nested_attr</span><span class="p">(</span><span class="n">proc_copy</span><span class="p">,</span> <span class="n">param_config</span><span class="p">[</span><span class="n">name</span><span class="p">],</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">sim</span> <span class="o">=</span> <span class="n">Cadet</span><span class="p">()</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">proc_copy</span><span class="p">)</span>
-            <span class="n">metrics</span> <span class="o">=</span> <span class="n">extract</span><span class="p">(</span><span class="n">sim</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">sim</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">Cadet</span><span class="p">()</span><span class="o">.</span><span class="n">simulate</span><span class="p">(</span><span class="n">proc_copy</span><span class="p">)</span>
+            <span class="n">metrics</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">extract</span><span class="p">(</span><span class="n">sim</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="c1"># Fallback to NaN if a simulation fails; keep length consistent</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Simulation failed for </span><span class="si">{</span><span class="n">param_set</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span><span class="n">m</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metric_names</span><span class="p">}</span>
+            <span class="n">metrics</span> <span class="o">=</span> <span class="p">{</span><span class="n">m</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;nan&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metric_names</span><span class="p">}</span>
 
         <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metric_names</span><span class="p">:</span>
-            <span class="n">metric_results</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">metrics</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+            <span class="n">metric_results</span><span class="p">[</span><span class="n">m</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">metrics</span><span class="p">[</span><span class="n">m</span><span class="p">]))</span>
 
-    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metric_names</span><span class="p">:</span>
-        <span class="n">metric_results</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">metric_results</span><span class="p">[</span><span class="n">m</span><span class="p">])</span>
+    <span class="n">metric_arrays</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ArrayF</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">m</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">vals</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span> <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="n">metric_results</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
 
-    <span class="n">sobol_results</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">sobol_results</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ArrayF</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">metric_names</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">=== Sobol Analysis for &#39;</span><span class="si">{</span><span class="n">m</span><span class="si">}</span><span class="s2">&#39; ===&quot;</span><span class="p">)</span>
-        <span class="n">Si</span> <span class="o">=</span> <span class="n">sobol</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">problem</span><span class="p">,</span> <span class="n">metric_results</span><span class="p">[</span><span class="n">m</span><span class="p">],</span> <span class="n">print_to_console</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">Si</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ArrayF</span> <span class="o">|</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">sobol</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span>
+            <span class="n">problem</span><span class="p">,</span>
+            <span class="n">metric_arrays</span><span class="p">[</span><span class="n">m</span><span class="p">],</span>
+            <span class="n">print_to_console</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="n">sobol_results</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="o">=</span> <span class="n">Si</span>
 
     <span class="k">return</span> <span class="n">sobol_results</span></div>

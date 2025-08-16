@@ -98,19 +98,19 @@
 <span id="chromasurr-error-analysis-module"></span><h1>chromasurr.error_analysis module<a class="headerlink" href="#module-chromasurr.error_analysis" title="Link to this heading"></a></h1>
 <p>Diagnostic tools for surrogate or calibrated model.</p>
 <p>This module collects lightweight helpers that assess how well a surrogate
-(e.g., a Gaussian‑process emulator) reproduces reference data.  In addition to
+(e.g., a Gaussian-process emulator) reproduces reference data.  In addition to
 the classic <em>RMSE</em>, <em>MAE</em> and coefficient of determination (<em>R²</em>), we provide</p>
 <ul class="simple">
-<li><p><strong>NRMSE</strong> – Normalised root‑mean‑square error (normalised by either the data
+<li><p><strong>NRMSE</strong> – Normalised root-mean-square error (normalised by either the data
 range, mean or standard deviation)</p></li>
 <li><p><strong>MAPE</strong> – Mean absolute percentage error</p></li>
 </ul>
-<p>A convenience wrapper <a href="#id1"><span class="problematic" id="id2">:pyfunc:`evaluate`</span></a> prints a traffic‑light style report so
+<p>A convenience wrapper <a class="reference internal" href="#chromasurr.error_analysis.evaluate" title="chromasurr.error_analysis.evaluate"><code class="xref py py-func docutils literal notranslate"><span class="pre">evaluate()</span></code></a> prints a traffic-light style report so
 users can immediately gauge surrogate quality in notebooks or scripts.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="chromasurr.error_analysis.basic_stats">
 <span class="sig-prename descclassname"><span class="pre">chromasurr.error_analysis.</span></span><span class="sig-name descname"><span class="pre">basic_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/error_analysis.html#basic_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.error_analysis.basic_stats" title="Link to this definition"></a></dt>
-<dd><p>Return basic point‑wise error statistics.</p>
+<dd><p>Return basic point-wise error statistics.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -127,7 +127,7 @@ users can immediately gauge surrogate quality in notebooks or scripts.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="chromasurr.error_analysis.evaluate">
 <span class="sig-prename descclassname"><span class="pre">chromasurr.error_analysis.</span></span><span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrmse_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mape_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'range'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/error_analysis.html#evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.error_analysis.evaluate" title="Link to this definition"></a></dt>
-<dd><p>Comprehensive error report with <em>traffic‑light</em> flags.</p>
+<dd><p>Comprehensive error report with <em>traffic-light</em> flags.</p>
 <p>Any metric that meets the respective threshold is marked ✅ (good), others
 ❌ (poor).  The verdict is the conjunction of all individual flags.</p>
 <dl class="field-list simple">
@@ -141,9 +141,9 @@ users can immediately gauge surrogate quality in notebooks or scripts.</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><em>dict</em> – Mapping from metric name to <em>(value, flag)</em> where <em>flag</em> is <em>True</em> if
-the surrogate passes the criterion.  An additional <em>verdict</em> key holds
-a human‑readable string.</p>
+<dd class="field-even"><p><em>dict</em> – Mapping from metric name to <code class="docutils literal notranslate"><span class="pre">(value,</span> <span class="pre">flag)</span></code> where <em>flag</em> is <em>True</em> if
+the surrogate passes the criterion.  An additional key <code class="docutils literal notranslate"><span class="pre">&quot;verdict&quot;</span></code>
+holds a human-readable string.</p>
 </dd>
 </dl>
 </dd></dl>
