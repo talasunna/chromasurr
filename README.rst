@@ -4,7 +4,7 @@ chromasurr – Uncertainty-Quantification Toolkit for Chromatography
 *A lightweight Python library that couples the CADET process simulator with modern sensitivity analysis, Gaussian-process surrogates, and diagnostic tools.*
 
 ✨ Highlights
-------------
+-------------
 
 - **Vectorized KPI extractor** – Compute retention time, peak width, and number of plates from any simulation in one call (``chromasurr.metrics.extract``)
 - **Global Sobol sensitivity** – One-liner ``run_sensitivity_analysis()`` to rank parameters with Saltelli sampling and automatic metric extraction
@@ -24,7 +24,7 @@ Run the demo in *≈ 60 seconds*:
 
    # 2. Create environment (Python ≥ 3.10)
    python3 -m venv .venv && source .venv/bin/activate
-   pip install -r requirements.txt  
+   pip install -r requirements.txt
 
    # 3. Launch the demo
    python examples/chromasurr_demo.py
@@ -55,7 +55,7 @@ CADET-Process is automatically installed via pip when installing ``chromasurr``.
    # 1. Instantiate a configurable process object
    proc = BatchElution(cycle_time=600.0, feed_duration=50.0)
 
-   # 2. Set up parameter configuration and choose metric 
+   # 2. Set up parameter configuration and choose metric
    param_config = {
         "ax_disp": "flow_sheet.column.axial_dispersion",
         "porosity": "flow_sheet.column.total_porosity",
@@ -94,9 +94,9 @@ CADET-Process is automatically installed via pip when installing ``chromasurr``.
   )
 
 
-     
-    
-  
+
+
+
 
 
 Sensitivity Analysis Workflow Options
@@ -118,7 +118,7 @@ All public functions include **NumPy-style docstrings** and **Python 3.10+ type 
 
 📚 Documentation
 ----------------
-*TBD – Documentation will be hosted on ReadTheDocs once stabilized.*
+Docs are hosted on GitHub Pages: <https://talasunna.github.io/chromasurr/>_
 
 🖇️ Project structure
 ---------------------

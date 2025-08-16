@@ -4,19 +4,24 @@
 chromasurr — API & User Reference
 ==================================
 
-A lightweight Python library that couples the CADET process simulator
-with modern sensitivity analysis, Gaussian-process surrogates,
-calibration, and diagnostic tools.
+.. toctree::
+   :maxdepth: 1         # <- prevents showing subheadings like "Stable release"
+   :titlesonly:
+   :caption: User Guide
+
+   installation
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Getting Started
-
-   getting_started
-
-.. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: API Reference
-   :glob:
 
-   api/chromasurr*
+   api/modules
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Project
+
+   readme
+   authors
+   contributing
+   history
