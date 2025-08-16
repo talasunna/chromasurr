@@ -20,8 +20,8 @@ release = "0.1.0"
 extensions: List[str] = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
-    "sphinx.ext.napoleon",          # NumPy-style docstrings
-    "sphinx_autodoc_typehints",     # render type hints
+    "sphinx.ext.napoleon",  # NumPy-style docstrings
+    "sphinx_autodoc_typehints",  # render type hints
     "sphinx.ext.viewcode",
     "sphinx.ext.mathjax",
     "sphinx.ext.intersphinx",

@@ -105,7 +105,7 @@ class BatchElution(Process):
 
         self.add_event_dependency("feed_off", ["feed_on", "feed_duration"], [1, 1])
         self.add_event_dependency("eluent_on", ["feed_off"], None)
-        self.add_event_dependency("eluent_off",
-                                  ["eluent_on", "eluent_duration"], [1, 1]
-                                  )
+        self.add_event_dependency(
+            "eluent_off", ["eluent_on", "eluent_duration"], [1, 1]
+        )
         self.cycle_time = cycle_time

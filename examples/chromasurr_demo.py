@@ -69,15 +69,15 @@ def main() -> None:
     uq = perform_monte_carlo_uq(
         surrogate=surr, sample_input=lhs_sampler, metric=metrics[0], n_samples=20000
     )
-    print(f"   > UQ 95% CI = ({uq['quantiles']['2.5%']:.3f}, {uq['quantiles']['97.5%']:.3f})")
+    print(
+        f"   > UQ 95% CI = ({uq['quantiles']['2.5%']:.3f}, {uq['quantiles']['97.5%']:.3f})"
+    )
     uq_distribution(uq, metric="peak_width")
     summarize_results(
         surrogate=surr,
         metric=metrics[0],
         uq_result=uq,
     )
-
-
 
 
 if __name__ == "__main__":
