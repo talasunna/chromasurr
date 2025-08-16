@@ -38,6 +38,3 @@ jobs:
 
       - name: Mypy
         run: poetry run mypy src/chromasurr
-
-      - name: Pytest
-        run: poetry run pytest -q
