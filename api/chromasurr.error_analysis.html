@@ -1,0 +1,234 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chromasurr.error_analysis module &mdash; chromasurr 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="chromasurr.metrics module" href="chromasurr.metrics.html" />
+    <link rel="prev" title="chromasurr package" href="chromasurr.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            chromasurr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="chromasurr.html">chromasurr package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">chromasurr.error_analysis module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#chromasurr.error_analysis.basic_stats"><code class="docutils literal notranslate"><span class="pre">basic_stats()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chromasurr.error_analysis.evaluate"><code class="docutils literal notranslate"><span class="pre">evaluate()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chromasurr.error_analysis.mape"><code class="docutils literal notranslate"><span class="pre">mape()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chromasurr.error_analysis.nrmse"><code class="docutils literal notranslate"><span class="pre">nrmse()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#chromasurr.error_analysis.parity_plot"><code class="docutils literal notranslate"><span class="pre">parity_plot()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="chromasurr.metrics.html">chromasurr.metrics module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chromasurr.sensitivity.html">chromasurr.sensitivity module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chromasurr.surrogate.html">chromasurr.surrogate module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chromasurr.uq.html">chromasurr.uq module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chromasurr.visualize.html">chromasurr.visualize module</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">chromasurr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="chromasurr.html">chromasurr package</a></li>
+      <li class="breadcrumb-item active">chromasurr.error_analysis module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/chromasurr.error_analysis.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-chromasurr.error_analysis">
+<span id="chromasurr-error-analysis-module"></span><h1>chromasurr.error_analysis module<a class="headerlink" href="#module-chromasurr.error_analysis" title="Link to this heading"></a></h1>
+<p>Diagnostic tools for surrogate or calibrated model.</p>
+<p>This module collects lightweight helpers that assess how well a surrogate
+(e.g., a Gaussian‑process emulator) reproduces reference data.  In addition to
+the classic <em>RMSE</em>, <em>MAE</em> and coefficient of determination (<em>R²</em>), we provide</p>
+<ul class="simple">
+<li><p><strong>NRMSE</strong> – Normalised root‑mean‑square error (normalised by either the data
+range, mean or standard deviation)</p></li>
+<li><p><strong>MAPE</strong> – Mean absolute percentage error</p></li>
+</ul>
+<p>A convenience wrapper <a href="#id1"><span class="problematic" id="id2">:pyfunc:`evaluate`</span></a> prints a traffic‑light style report so
+users can immediately gauge surrogate quality in notebooks or scripts.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="chromasurr.error_analysis.basic_stats">
+<span class="sig-prename descclassname"><span class="pre">chromasurr.error_analysis.</span></span><span class="sig-name descname"><span class="pre">basic_stats</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/error_analysis.html#basic_stats"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.error_analysis.basic_stats" title="Link to this definition"></a></dt>
+<dd><p>Return basic point‑wise error statistics.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_true</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><em>numpy.ndarray</em></a>) – Arrays of equal length containing reference and predicted values.</p></li>
+<li><p><strong>y_pred</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><em>numpy.ndarray</em></a>) – Arrays of equal length containing reference and predicted values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>dict</em> – <em>RMSE</em>, <em>MAE</em> and <em>R²</em> in a dictionary.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chromasurr.error_analysis.evaluate">
+<span class="sig-prename descclassname"><span class="pre">chromasurr.error_analysis.</span></span><span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">nrmse_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mape_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'range'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/error_analysis.html#evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.error_analysis.evaluate" title="Link to this definition"></a></dt>
+<dd><p>Comprehensive error report with <em>traffic‑light</em> flags.</p>
+<p>Any metric that meets the respective threshold is marked ✅ (good), others
+❌ (poor).  The verdict is the conjunction of all individual flags.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_true</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><em>numpy.ndarray</em></a>) – Arrays with reference and predicted values.</p></li>
+<li><p><strong>y_pred</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><em>numpy.ndarray</em></a>) – Arrays with reference and predicted values.</p></li>
+<li><p><strong>nrmse_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>default=0.10</em>) – Acceptable NRMSE (relative units).</p></li>
+<li><p><strong>mape_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><em>float</em></a><em>, </em><em>default=0.05</em>) – Acceptable MAPE (fractional).</p></li>
+<li><p><strong>norm</strong> (<em>{'range'</em><em>, </em><em>'mean'</em><em>, </em><em>'std'}</em><em>, </em><em>default='range'</em>) – Scaling used for NRMSE.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>dict</em> – Mapping from metric name to <em>(value, flag)</em> where <em>flag</em> is <em>True</em> if
+the surrogate passes the criterion.  An additional <em>verdict</em> key holds
+a human‑readable string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chromasurr.error_analysis.mape">
+<span class="sig-prename descclassname"><span class="pre">chromasurr.error_analysis.</span></span><span class="sig-name descname"><span class="pre">mape</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/error_analysis.html#mape"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.error_analysis.mape" title="Link to this definition"></a></dt>
+<dd><p>Mean absolute percentage error.</p>
+<p><code class="docutils literal notranslate"><span class="pre">MAPE</span> <span class="pre">=</span> <span class="pre">mean(|y_true</span> <span class="pre">−</span> <span class="pre">y_pred|</span> <span class="pre">/</span> <span class="pre">|y_true|)</span></code> expressed as a fraction.</p>
+<p>Returns <em>nan</em> if any true value is zero, as the percentage error would be
+undefined.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chromasurr.error_analysis.nrmse">
+<span class="sig-prename descclassname"><span class="pre">chromasurr.error_analysis.</span></span><span class="sig-name descname"><span class="pre">nrmse</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'range'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/error_analysis.html#nrmse"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.error_analysis.nrmse" title="Link to this definition"></a></dt>
+<dd><p>Compute the <em>normalised</em> RMSE.</p>
+<p>The RMSE is divided by one of three scale factors:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;range&quot;</span></code> – max(y_true) − min(y_true)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;mean&quot;</span></code> – mean(y_true)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;std&quot;</span></code>  – population standard deviation of y_true</p></li>
+</ul>
+<p>Normalising puts error into perspective and enables comparison across
+metrics with different units.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_true</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><em>numpy.ndarray</em></a>) – Reference and predicted data.</p></li>
+<li><p><strong>y_pred</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><em>numpy.ndarray</em></a>) – Reference and predicted data.</p></li>
+<li><p><strong>norm</strong> (<em>{'range'</em><em>, </em><em>'mean'</em><em>, </em><em>'std'}</em><em>, </em><em>default='range'</em>) – Scaling to use.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>float</em> – NRMSE in relative units (0 ⟹ perfect fit, higher is worse).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="chromasurr.error_analysis.parity_plot">
+<span class="sig-prename descclassname"><span class="pre">chromasurr.error_analysis.</span></span><span class="sig-name descname"><span class="pre">parity_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">y_true</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_pred</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">ax</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/error_analysis.html#parity_plot"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.error_analysis.parity_plot" title="Link to this definition"></a></dt>
+<dd><p>Scatter plot of predicted vs. observed values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>y_true</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><em>numpy.ndarray</em></a>) – Reference and predicted data.</p></li>
+<li><p><strong>y_pred</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><em>numpy.ndarray</em></a>) – Reference and predicted data.</p></li>
+<li><p><strong>ax</strong> (<a class="reference external" href="https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.html#matplotlib.axes.Axes" title="(in Matplotlib v3.10.5)"><em>matplotlib.axes.Axes</em></a><em>, </em><em>optional</em>) – Existing axes to plot on.  If <em>None</em>, a new figure/axes is created.</p></li>
+<li><p><strong>label</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – Legend label for the scatter points.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>matplotlib.axes.Axes</em> – The axis the data was plotted on.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="chromasurr.html" class="btn btn-neutral float-left" title="chromasurr package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="chromasurr.metrics.html" class="btn btn-neutral float-right" title="chromasurr.metrics module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Tala Al-Sunna.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

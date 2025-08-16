@@ -1,0 +1,237 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chromasurr – Uncertainty-Quantification Toolkit for Chromatography &mdash; chromasurr 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=01f34227"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            chromasurr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api/chromasurr.html">chromasurr package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/chromasurr.error_analysis.html">chromasurr.error_analysis module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/chromasurr.metrics.html">chromasurr.metrics module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/chromasurr.sensitivity.html">chromasurr.sensitivity module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/chromasurr.surrogate.html">chromasurr.surrogate module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/chromasurr.uq.html">chromasurr.uq module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api/chromasurr.visualize.html">chromasurr.visualize module</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">chromasurr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">chromasurr – Uncertainty-Quantification Toolkit for Chromatography</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/readme.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="chromasurr-uncertainty-quantification-toolkit-for-chromatography">
+<h1>chromasurr – Uncertainty-Quantification Toolkit for Chromatography<a class="headerlink" href="#chromasurr-uncertainty-quantification-toolkit-for-chromatography" title="Link to this heading"></a></h1>
+<p><em>A lightweight Python library that couples the CADET process simulator with modern sensitivity analysis, Gaussian-process surrogates, and diagnostic tools.</em></p>
+<section id="highlights">
+<h2>✨ Highlights<a class="headerlink" href="#highlights" title="Link to this heading"></a></h2>
+<ul class="simple">
+<li><p><strong>Vectorized KPI extractor</strong> – Compute retention time, peak width, and number of plates from any simulation in one call (<code class="docutils literal notranslate"><span class="pre">chromasurr.metrics.extract</span></code>)</p></li>
+<li><p><strong>Global Sobol sensitivity</strong> – One-liner <code class="docutils literal notranslate"><span class="pre">run_sensitivity_analysis()</span></code> to rank parameters with Saltelli sampling and automatic metric extraction</p></li>
+<li><p><strong>Gaussian-process surrogate manager</strong> – The <code class="docutils literal notranslate"><span class="pre">Surrogate</span></code> class trains, prunes, and re-trains emulators in log-space; includes built-in sensitivity on the GP itself</p></li>
+<li><p><strong>Reusable process builder</strong> – The <code class="docutils literal notranslate"><span class="pre">BatchElution</span></code> class provides a ready-to-use CADET process object with configurable parameters like cycle time and feed duration</p></li>
+<li><p><strong>End-to-end example</strong> – Full demo in <code class="docutils literal notranslate"><span class="pre">examples/chromasurr_demo.py</span></code> covering sensitivity analysis, calibration, and UQ</p></li>
+</ul>
+</section>
+<section id="quick-start">
+<h2>🚀 Quick start<a class="headerlink" href="#quick-start" title="Link to this heading"></a></h2>
+<p>Run the demo in <em>≈ 60 seconds</em>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># 1. Clone the repository</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/talasunna/chromasurr.git<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>chromasurr
+
+<span class="c1"># 2. Create environment (Python ≥ 3.10)</span>
+python3<span class="w"> </span>-m<span class="w"> </span>venv<span class="w"> </span>.venv<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">source</span><span class="w"> </span>.venv/bin/activate
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+
+<span class="c1"># 3. Launch the demo</span>
+python<span class="w"> </span>examples/chromasurr_demo.py
+</pre></div>
+</div>
+<p>This runs a full workflow using a preconfigured <code class="docutils literal notranslate"><span class="pre">BatchElution</span></code> process and guides you through GP surrogate modeling, Sobol sensitivity analysis, and Bayesian calibration.</p>
+</section>
+<section id="installation">
+<h2>📦 Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/talasunna/chromasurr.git
+</pre></div>
+</div>
+<p><strong>Note</strong> – CADET-Core must be installed or compiled on your system. See the <a class="reference external" href="https://cadet.github.io/master/getting_started/installation_core.html">CADET-Core Installation Guide</a> for details.</p>
+<p>CADET-Process is automatically installed via pip when installing <code class="docutils literal notranslate"><span class="pre">chromasurr</span></code>.</p>
+</section>
+<section id="usage-at-a-glance">
+<h2>🛠️ Usage at a glance<a class="headerlink" href="#usage-at-a-glance" title="Link to this heading"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span> <span class="kn">from</span><span class="w"> </span><span class="nn">chromasurr.surrogate</span><span class="w"> </span><span class="kn">import</span> <span class="n">Surrogate</span>
+ <span class="kn">from</span><span class="w"> </span><span class="nn">chromasurr.uq</span><span class="w"> </span><span class="kn">import</span> <span class="n">perform_monte_carlo_uq</span><span class="p">,</span> <span class="n">latin_hypercube_sampler</span>
+ <span class="kn">from</span><span class="w"> </span><span class="nn">chromasurr.visualize</span><span class="w"> </span><span class="kn">import</span> <span class="n">sobol_indices</span><span class="p">,</span> <span class="n">summarize_results</span><span class="p">,</span> <span class="n">uq_distribution</span>
+ <span class="kn">from</span><span class="w"> </span><span class="nn">chromasurr.process.batch_elution</span><span class="w"> </span><span class="kn">import</span> <span class="n">BatchElution</span>
+
+ <span class="c1"># 1. Instantiate a configurable process object</span>
+ <span class="n">proc</span> <span class="o">=</span> <span class="n">BatchElution</span><span class="p">(</span><span class="n">cycle_time</span><span class="o">=</span><span class="mf">600.0</span><span class="p">,</span> <span class="n">feed_duration</span><span class="o">=</span><span class="mf">50.0</span><span class="p">)</span>
+
+ <span class="c1"># 2. Set up parameter configuration and choose metric</span>
+ <span class="n">param_config</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s2">&quot;ax_disp&quot;</span><span class="p">:</span> <span class="s2">&quot;flow_sheet.column.axial_dispersion&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;porosity&quot;</span><span class="p">:</span> <span class="s2">&quot;flow_sheet.column.total_porosity&quot;</span><span class="p">,</span>
+  <span class="p">}</span>
+  <span class="n">bounds</span> <span class="o">=</span> <span class="p">{</span>
+      <span class="s2">&quot;ax_disp&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">1e-6</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">],</span>
+      <span class="s2">&quot;porosity&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">],</span>
+  <span class="p">}</span>
+  <span class="n">metrics</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;peak_width&quot;</span><span class="p">]</span>
+
+ <span class="c1"># 3. Train surrogate</span>
+ <span class="n">surr</span> <span class="o">=</span> <span class="n">Surrogate</span><span class="p">(</span><span class="n">proc</span><span class="p">,</span> <span class="n">param_config</span><span class="p">,</span> <span class="n">bounds</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">n_train</span><span class="o">=</span><span class="mi">128</span><span class="p">)</span>
+ <span class="n">surr</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+
+ <span class="c1"># 4. Run sensitivity analysis</span>
+ <span class="n">surr</span><span class="o">.</span><span class="n">analyze_sensitivity</span><span class="p">(</span><span class="n">n_samples</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>
+ <span class="n">sobol_results</span> <span class="o">=</span> <span class="n">surr</span><span class="o">.</span><span class="n">sensitivity</span>
+
+ <span class="c1"># 5. Selection of most important parameters, either based on a threshold or the number of parameters you want, and retrain model based on selection</span>
+ <span class="n">surr</span><span class="o">.</span><span class="n">select_important_params</span><span class="p">(</span><span class="n">threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+ <span class="n">surr</span><span class="o">.</span><span class="n">retrain</span><span class="p">()</span>
+
+ <span class="c1"># 6. Set up latin hypercube sampler and run uncertainty quantification</span>
+ <span class="n">lhs_sampler</span> <span class="o">=</span> <span class="n">latin_hypercube_sampler</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">surr</span><span class="o">.</span><span class="n">bounds</span><span class="o">.</span><span class="n">values</span><span class="p">()))</span>
+ <span class="n">uq</span> <span class="o">=</span> <span class="n">perform_monte_carlo_uq</span><span class="p">(</span><span class="n">surrogate</span><span class="o">=</span><span class="n">surr</span><span class="p">,</span> <span class="n">sample_input</span><span class="o">=</span><span class="n">lhs_sampler</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metrics</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">n_samples</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+
+ <span class="c1"># 7. Visualize your analyses: sobol indices, uq distribution, and your results</span>
+<span class="n">uq_distribution</span><span class="p">(</span><span class="n">uq</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="s2">&quot;peak_width&quot;</span><span class="p">)</span>
+
+<span class="n">sobol_indices</span><span class="p">(</span><span class="n">sobol_results</span><span class="p">,</span> <span class="n">metric</span><span class="o">=</span><span class="n">metrics</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">summarize_results</span><span class="p">(</span>
+    <span class="n">surrogate</span><span class="o">=</span><span class="n">surr</span><span class="p">,</span>
+    <span class="n">metric</span><span class="o">=</span><span class="n">metrics</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+    <span class="n">uq_result</span><span class="o">=</span><span class="n">uq</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="sensitivity-analysis-workflow-options">
+<h2>Sensitivity Analysis Workflow Options<a class="headerlink" href="#sensitivity-analysis-workflow-options" title="Link to this heading"></a></h2>
+<ul>
+<li><p><strong>Option 1: Run Sensitivity Analysis First, Then Train Surrogate</strong></p>
+<p>Use <code class="docutils literal notranslate"><span class="pre">run_sensitivity_analysis</span></code> on the CADET model to rank parameters, then train a surrogate focusing on the important ones (based on     the number of parameters you’d like to retain, or on a threshold you can decide).</p>
+</li>
+<li><p><strong>Option 2: Train Surrogate First, Then Run Sensitivity Analysis</strong></p>
+<p>Fit a surrogate with <code class="docutils literal notranslate"><span class="pre">Surrogate</span></code>, then analyze it with <code class="docutils literal notranslate"><span class="pre">analyze_sensitivity()</span></code>.</p>
+</li>
+</ul>
+<p>Both paths support uncertainty quantification and parameter calibration workflows.</p>
+<p>—</p>
+<p>All public functions include <strong>NumPy-style docstrings</strong> and <strong>Python 3.10+ type hints</strong> for autocompletion and static analysis.</p>
+</section>
+<section id="documentation">
+<h2>📚 Documentation<a class="headerlink" href="#documentation" title="Link to this heading"></a></h2>
+<p><em>TBD – Documentation will be hosted on ReadTheDocs once stabilized.</em></p>
+</section>
+<section id="project-structure">
+<h2>🖇️ Project structure<a class="headerlink" href="#project-structure" title="Link to this heading"></a></h2>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>chromasurr/
+│   __init__.py
+│   metrics.py              ← KPI extractor
+│   sensitivity.py          ← Saltelli driver + helpers
+│   surrogate.py            ← Surrogate manager
+│   uq.py                   ← Uncertainty quantification tools
+│   error_analysis.py       ← Error diagnostics
+├── process/
+│   └── batch_elution.py    ← Configurable CADET Process class
+└── examples/
+    └── chromasurr_demo.py  ← End-to-end demo script
+
+docs/
+tests/
+</pre></div>
+</div>
+</section>
+<section id="license">
+<h2>📜 License<a class="headerlink" href="#license" title="Link to this heading"></a></h2>
+<p>Distributed under the <strong>MIT License</strong> – see <em>LICENSE</em> for details.</p>
+<p>Made with ☕ by <strong>Tala Al-Sunna</strong>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Tala Al-Sunna.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

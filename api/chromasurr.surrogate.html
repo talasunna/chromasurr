@@ -1,0 +1,261 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>chromasurr.surrogate module &mdash; chromasurr 0.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=01f34227"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="chromasurr.uq module" href="chromasurr.uq.html" />
+    <link rel="prev" title="chromasurr.sensitivity module" href="chromasurr.sensitivity.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            chromasurr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="chromasurr.html">chromasurr package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chromasurr.error_analysis.html">chromasurr.error_analysis module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chromasurr.metrics.html">chromasurr.metrics module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chromasurr.sensitivity.html">chromasurr.sensitivity module</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">chromasurr.surrogate module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#chromasurr.surrogate.Surrogate"><code class="docutils literal notranslate"><span class="pre">Surrogate</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#chromasurr.surrogate.Surrogate.analyze_sensitivity"><code class="docutils literal notranslate"><span class="pre">Surrogate.analyze_sensitivity()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chromasurr.surrogate.Surrogate.predict"><code class="docutils literal notranslate"><span class="pre">Surrogate.predict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chromasurr.surrogate.Surrogate.predict_var"><code class="docutils literal notranslate"><span class="pre">Surrogate.predict_var()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chromasurr.surrogate.Surrogate.retrain"><code class="docutils literal notranslate"><span class="pre">Surrogate.retrain()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chromasurr.surrogate.Surrogate.select_important_params"><code class="docutils literal notranslate"><span class="pre">Surrogate.select_important_params()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#chromasurr.surrogate.Surrogate.train"><code class="docutils literal notranslate"><span class="pre">Surrogate.train()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="chromasurr.uq.html">chromasurr.uq module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="chromasurr.visualize.html">chromasurr.visualize module</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">chromasurr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="chromasurr.html">chromasurr package</a></li>
+      <li class="breadcrumb-item active">chromasurr.surrogate module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/chromasurr.surrogate.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-chromasurr.surrogate">
+<span id="chromasurr-surrogate-module"></span><h1>chromasurr.surrogate module<a class="headerlink" href="#module-chromasurr.surrogate" title="Link to this heading"></a></h1>
+<p>surrogate.py – Gaussian‑process replacement of CADET simulations.</p>
+<p>This module provides the <a class="reference internal" href="#chromasurr.surrogate.Surrogate" title="chromasurr.surrogate.Surrogate"><code class="xref py py-class docutils literal notranslate"><span class="pre">Surrogate</span></code></a> class that can</p>
+<ol class="arabic simple">
+<li><p>sample the CADET parameter space with Saltelli’s method,</p></li>
+<li><p>train one Gaussian‑process (GP) emulator <strong>per KPI</strong> in log‑space,</p></li>
+<li><p>perform <em>cheap</em> Sobol sensitivity analysis <em>on</em> the GP,</p></li>
+<li><p>keep only the most important parameters (user‑defined criterion), and</p></li>
+<li><p>retrain <strong>without rerunning CADET</strong>.</p></li>
+</ol>
+<p>It also exposes <a class="reference internal" href="#chromasurr.surrogate.Surrogate.predict" title="chromasurr.surrogate.Surrogate.predict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Surrogate.predict()</span></code></a> and
+<a class="reference internal" href="#chromasurr.surrogate.Surrogate.predict_var" title="chromasurr.surrogate.Surrogate.predict_var"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Surrogate.predict_var()</span></code></a> so you can propagate uncertainty later
+(e.g. with <code class="docutils literal notranslate"><span class="pre">chromasurr.uq.perform_monte_carlo_uq</span></code>).</p>
+<p>All public methods carry Numpy‑style docstrings and full Python ≥3.10
+static type hints.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="chromasurr.surrogate.Surrogate">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">chromasurr.surrogate.</span></span><span class="sig-name descname"><span class="pre">Surrogate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">process</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">param_config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bounds</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metrics</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">kernel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/surrogate.html#Surrogate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.surrogate.Surrogate" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Gaussian‑process surrogate for a CADET chromatography workflow.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>process</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Process</span></code></span>) – Fully configured <code class="xref py py-class docutils literal notranslate"><span class="pre">CADETProcess.processModel.process.Process</span></code>.</p></li>
+<li><p><strong>param_config</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Mapping from <em>parameter names to *attribute paths</em>
+on <em>process</em>, e.g. <code class="docutils literal notranslate"><span class="pre">{&quot;ads_rate_A&quot;:</span> <span class="pre">&quot;flow_sheet.column.binding_model.adsorption_rate[0]&quot;}</span></code>.</p></li>
+<li><p><strong>bounds</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a>]]</span>) – Lower/upper bounds for each parameter – same keys/order as
+<em>param_config</em>.</p></li>
+<li><p><strong>metrics</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Keys returned by <a class="reference internal" href="chromasurr.metrics.html#chromasurr.metrics.extract" title="chromasurr.metrics.extract"><code class="xref py py-func docutils literal notranslate"><span class="pre">chromasurr.metrics.extract()</span></code></a> to emulate.</p></li>
+<li><p><strong>n_train</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Saltelli <em>base</em> sample size.  Total sims ≈ <code class="docutils literal notranslate"><span class="pre">n_train</span> <span class="pre">×</span> <span class="pre">(2D</span> <span class="pre">+</span> <span class="pre">2)</span></code>.</p></li>
+<li><p><strong>kernel</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">Kernel</span></code> | <a class="reference external" href="https://docs.python.org/3/library/functions.html#type" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">type</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – scikit‑learn kernel or class.  Defaults to <code class="docutils literal notranslate"><span class="pre">Matern(1.5)+White</span></code>.</p></li>
+<li><p><strong>seed</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – RNG seed (NumPy <em>and</em> scikit‑learn).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="chromasurr.surrogate.Surrogate.analyze_sensitivity">
+<span class="sig-name descname"><span class="pre">analyze_sensitivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_samples</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_to_console</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/surrogate.html#Surrogate.analyze_sensitivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.surrogate.Surrogate.analyze_sensitivity" title="Link to this definition"></a></dt>
+<dd><p>Global Sobol indices <em>via</em> the trained GP.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>n_samples</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Saltelli base sample size for the surrogate evaluation.</p></li>
+<li><p><strong>metric</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> | <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span>) – If <em>None</em> analyse <strong>all</strong> metrics and store under
+<a href="#id1"><span class="problematic" id="id2">:pyattr:`sensitivity`</span></a>; otherwise analyse only <em>metric</em>.</p></li>
+<li><p><strong>log_space</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Analyse on the GP training scale (<code class="docutils literal notranslate"><span class="pre">True</span></code>) or exponentiate the
+predictions first (<code class="docutils literal notranslate"><span class="pre">False</span></code>).</p></li>
+<li><p><strong>print_to_console</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Forward <em>SALib</em>’s textual summary to <em>stdout</em>?</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chromasurr.surrogate.Surrogate.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/surrogate.html#Surrogate.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.surrogate.Surrogate.predict" title="Link to this definition"></a></dt>
+<dd><p>Predict <strong>mean</strong> of <em>metric</em> on original scale.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>metric</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span>) – Which KPI to return.</p></li>
+<li><p><strong>X</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span>) – Array of shape <code class="docutils literal notranslate"><span class="pre">(n_samples,</span> <span class="pre">n_params)</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chromasurr.surrogate.Surrogate.predict_var">
+<span class="sig-name descname"><span class="pre">predict_var</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">metric</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/surrogate.html#Surrogate.predict_var"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.surrogate.Surrogate.predict_var" title="Link to this definition"></a></dt>
+<dd><p>Predict <strong>variance</strong> of <em>metric</em> (original scale).</p>
+<p>Formula for a log‑normal variable <code class="docutils literal notranslate"><span class="pre">Y</span> <span class="pre">=</span> <span class="pre">exp(Z),</span>&#160; <span class="pre">Z~N(μ,</span> <span class="pre">σ²)</span></code></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>Var[Y] = (e^{σ²} - 1) · e^{2μ + σ²}
+</pre></div>
+</div>
+<p>See e.g. <em>Crow &amp; Shimizu (1988), Lognormal Distributions</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chromasurr.surrogate.Surrogate.retrain">
+<span class="sig-name descname"><span class="pre">retrain</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/surrogate.html#Surrogate.retrain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.surrogate.Surrogate.retrain" title="Link to this definition"></a></dt>
+<dd><p>Retrain <strong>without</strong> new CADET runs, using only <em>top_params</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chromasurr.surrogate.Surrogate.select_important_params">
+<span class="sig-name descname"><span class="pre">select_important_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_top</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/surrogate.html#Surrogate.select_important_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.surrogate.Surrogate.select_important_params" title="Link to this definition"></a></dt>
+<dd><p>Pick <em>key</em> parameters based on total Sobol indices.</p>
+<p>Exactly <strong>one</strong> of <em>threshold</em> or <em>n_top</em> can be given.  The default
+keeps parameters with <code class="docutils literal notranslate"><span class="pre">ST</span> <span class="pre">≥</span> <span class="pre">0.05</span></code> <em>for the first metric</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><em>list[str]</em> – The retained parameter names.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="chromasurr.surrogate.Surrogate.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/chromasurr/surrogate.html#Surrogate.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#chromasurr.surrogate.Surrogate.train" title="Link to this definition"></a></dt>
+<dd><p>Run CADET on a Saltelli design and fit one GP <strong>per metric</strong>.</p>
+<p>The method</p>
+<ol class="arabic simple">
+<li><p>draws a Saltelli sample <code class="docutils literal notranslate"><span class="pre">X_full</span></code> with <em>n_train</em> base samples,</p></li>
+<li><p>simulates CADET for each sample and extracts <em>metrics</em>,</p></li>
+<li><p>builds a <em>single</em> <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.preprocessing.StandardScaler</span></code>
+on the <strong>intersection</strong> of rows valid for <em>all</em> metrics, and</p></li>
+<li><p>fits a <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.gaussian_process.GaussianProcessRegressor</span></code>
+on <code class="docutils literal notranslate"><span class="pre">log(y)</span></code> for each metric.</p></li>
+</ol>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="chromasurr.sensitivity.html" class="btn btn-neutral float-left" title="chromasurr.sensitivity module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="chromasurr.uq.html" class="btn btn-neutral float-right" title="chromasurr.uq module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, Tala Al-Sunna.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
