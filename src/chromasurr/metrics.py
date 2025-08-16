@@ -4,9 +4,7 @@ import numpy as np
 from CADETProcess.simulationResults import SimulationResults
 
 
-def extract(
-    sim: SimulationResults, chromatogram_index: int = 0
-) -> tuple[float, float, float]:
+def extract(sim: SimulationResults, chromatogram_index: int = 0) -> dict[str, float]:
     """
     Compute FWHM, retention time, and number of theoretical plates.
 
