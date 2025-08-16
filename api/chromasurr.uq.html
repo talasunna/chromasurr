@@ -44,17 +44,28 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="chromasurr.html">chromasurr package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="chromasurr.error_analysis.html">chromasurr.error_analysis module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="chromasurr.metrics.html">chromasurr.metrics module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="chromasurr.sensitivity.html">chromasurr.sensitivity module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="chromasurr.surrogate.html">chromasurr.surrogate module</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">chromasurr.uq module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#chromasurr.uq.latin_hypercube_sampler"><code class="docutils literal notranslate"><span class="pre">latin_hypercube_sampler()</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="#chromasurr.uq.perform_monte_carlo_uq"><code class="docutils literal notranslate"><span class="pre">perform_monte_carlo_uq()</span></code></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">chromasurr</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="chromasurr.html">chromasurr package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="chromasurr.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="chromasurr.error_analysis.html">chromasurr.error_analysis module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="chromasurr.metrics.html">chromasurr.metrics module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="chromasurr.sensitivity.html">chromasurr.sensitivity module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="chromasurr.surrogate.html">chromasurr.surrogate module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">chromasurr.uq module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="chromasurr.visualize.html">chromasurr.visualize module</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="chromasurr.visualize.html">chromasurr.visualize module</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../readme.html">chromasurr – Uncertainty-Quantification Toolkit for Chromatography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../history.html">History</a></li>
 </ul>
 
         </div>
@@ -71,6 +82,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">chromasurr</a></li>
           <li class="breadcrumb-item"><a href="chromasurr.html">chromasurr package</a></li>
       <li class="breadcrumb-item active">chromasurr.uq module</li>
       <li class="wy-breadcrumbs-aside">
@@ -110,16 +122,20 @@ array of sampled inputs.</p>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>surrogate</strong> (<a class="reference internal" href="chromasurr.surrogate.html#chromasurr.surrogate.Surrogate" title="chromasurr.surrogate.Surrogate"><em>Surrogate</em></a>) – Trained surrogate model providing <cite>predict</cite> and <cite>predict_var</cite> methods.</p></li>
-<li><p><strong>sample_input</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>]</em><em>, </em><em>np.ndarray</em><em>]</em>) – Function that generates an array of shape (n_samples, num_vars) of input samples.</p></li>
-<li><p><strong>metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> or </em><em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em><em>, </em><em>optional</em>) – Metric name or list of metric names to evaluate. If None, uses all surrogate.metrics.</p></li>
+<li><p><strong>sample_input</strong> (<em>Callable</em><em>[</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>]</em><em>, </em><em>np.ndarray</em><em>]</em>) – Function that generates an array of shape (n_samples, num_vars) of input
+samples.</p></li>
+<li><p><strong>metrics</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> or </em><em>Sequence</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em><em>, </em><em>optional</em>) – Metric name or list of metric names to evaluate. If None, uses all
+surrogate.metrics.</p></li>
 <li><p><strong>metric</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – Legacy single-metric alias; if provided, <cite>metrics</cite> must be None.</p></li>
 <li><p><strong>n_samples</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>default 10000</em>) – Number of Monte Carlo samples to draw.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><em>dict or dict of dict</em> – If <cite>metric</cite> is specified or a single metric, returns a dict with keys:
-‘mean’, ‘variance’, ‘var_between’, ‘var_within’, ‘quantiles’, ‘y_means’, ‘y_vars’.
-If multiple metrics, returns a mapping from each metric name to its statistics dict.</p>
+‘mean’, ‘variance’, ‘var_between’, ‘var_within’, ‘quantiles’, ‘y_means’,
+‘y_vars’.
+If multiple metrics, returns a mapping from each metric name to its statistics
+dict.</p>
 </dd>
 <dt class="field-odd">Raises<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If both <cite>metric</cite> and <cite>metrics</cite> are provided, or if the sampled input array

@@ -41,13 +41,14 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <p class="caption" role="heading"><span class="caption-text">API Reference</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="../../api/chromasurr.html">chromasurr package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api/chromasurr.error_analysis.html">chromasurr.error_analysis module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api/chromasurr.metrics.html">chromasurr.metrics module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api/chromasurr.sensitivity.html">chromasurr.sensitivity module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api/chromasurr.surrogate.html">chromasurr.surrogate module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api/chromasurr.uq.html">chromasurr.uq module</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../api/chromasurr.visualize.html">chromasurr.visualize module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/modules.html">chromasurr</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Project</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">chromasurr – Uncertainty-Quantification Toolkit for Chromatography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Credits</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../history.html">History</a></li>
 </ul>
 
         </div>
@@ -172,9 +173,11 @@
 <span class="sd">    surrogate : Surrogate</span>
 <span class="sd">        Trained surrogate model providing `predict` and `predict_var` methods.</span>
 <span class="sd">    sample_input : Callable[[int], np.ndarray]</span>
-<span class="sd">        Function that generates an array of shape (n_samples, num_vars) of input samples.</span>
+<span class="sd">        Function that generates an array of shape (n_samples, num_vars) of input</span>
+<span class="sd">        samples.</span>
 <span class="sd">    metrics : str or Sequence[str], optional</span>
-<span class="sd">        Metric name or list of metric names to evaluate. If None, uses all surrogate.metrics.</span>
+<span class="sd">        Metric name or list of metric names to evaluate. If None, uses all</span>
+<span class="sd">        surrogate.metrics.</span>
 <span class="sd">    metric : str, optional</span>
 <span class="sd">        Legacy single-metric alias; if provided, `metrics` must be None.</span>
 <span class="sd">    n_samples : int, default 10000</span>
@@ -184,8 +187,10 @@
 <span class="sd">    -------</span>
 <span class="sd">    dict or dict of dict</span>
 <span class="sd">        If `metric` is specified or a single metric, returns a dict with keys:</span>
-<span class="sd">        &#39;mean&#39;, &#39;variance&#39;, &#39;var_between&#39;, &#39;var_within&#39;, &#39;quantiles&#39;, &#39;y_means&#39;, &#39;y_vars&#39;.</span>
-<span class="sd">        If multiple metrics, returns a mapping from each metric name to its statistics dict.</span>
+<span class="sd">        &#39;mean&#39;, &#39;variance&#39;, &#39;var_between&#39;, &#39;var_within&#39;, &#39;quantiles&#39;, &#39;y_means&#39;,</span>
+<span class="sd">        &#39;y_vars&#39;.</span>
+<span class="sd">        If multiple metrics, returns a mapping from each metric name to its statistics</span>
+<span class="sd">        dict.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -203,7 +208,7 @@
         <span class="n">flatten</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">metrics_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
 
     <span class="n">X</span> <span class="o">=</span> <span class="n">sample_input</span><span class="p">(</span><span class="n">n_samples</span><span class="p">)</span>
-    <span class="n">expected_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">surrogate</span><span class="o">.</span><span class="n">problem</span><span class="p">[</span><span class="s2">&quot;num_vars&quot;</span><span class="p">])</span>  <span class="c1"># type: ignore[index]</span>
+    <span class="n">expected_shape</span> <span class="o">=</span> <span class="p">(</span><span class="n">n_samples</span><span class="p">,</span> <span class="n">surrogate</span><span class="o">.</span><span class="n">problem</span><span class="p">[</span><span class="s2">&quot;num_vars&quot;</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">X</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">expected_shape</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;sample_input returned array of wrong shape&quot;</span><span class="p">)</span>
 

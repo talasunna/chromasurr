@@ -28,24 +28,22 @@ From sources
 
 The sources for chromasurr can be downloaded from the `Github repo`_.
 
-You can either clone the public repository:
+You can clone the public repository:
 
 .. code-block:: console
 
     $ git clone git://github.com/talasunna/chromasurr
 
-Or download the `tarball`_:
-
-.. code-block:: console
-
-    $ curl -OJL https://github.com/talasunna/chromasurr/tarball/master
-
-Once you have a copy of the source, you can install it with:
-
-.. code-block:: console
-
-    $ python setup.py install
 
 
 .. _Github repo: https://github.com/talasunna/chromasurr
-.. _tarball: https://github.com/talasunna/chromasurr/tarball/master
+
+CADET-Core dependency
+=====================
+
+In order to use *chromasurr*, you must also install
+**CADET-Core**, the C++ solver that powers CADET-Process.
+
+Please follow the official CADET installation guide:
+
+- `CADET-Core installation instructions <https://cadet.github.io/master/getting_started/installation_core.html>`_
