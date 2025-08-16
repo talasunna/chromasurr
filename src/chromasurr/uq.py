@@ -90,9 +90,11 @@ def perform_monte_carlo_uq(
     surrogate : Surrogate
         Trained surrogate model providing `predict` and `predict_var` methods.
     sample_input : Callable[[int], np.ndarray]
-        Function that generates an array of shape (n_samples, num_vars) of input samples.
+        Function that generates an array of shape (n_samples, num_vars) of input
+        samples.
     metrics : str or Sequence[str], optional
-        Metric name or list of metric names to evaluate. If None, uses all surrogate.metrics.
+        Metric name or list of metric names to evaluate. If None, uses all
+        surrogate.metrics.
     metric : str, optional
         Legacy single-metric alias; if provided, `metrics` must be None.
     n_samples : int, default 10000
@@ -102,8 +104,10 @@ def perform_monte_carlo_uq(
     -------
     dict or dict of dict
         If `metric` is specified or a single metric, returns a dict with keys:
-        'mean', 'variance', 'var_between', 'var_within', 'quantiles', 'y_means', 'y_vars'.
-        If multiple metrics, returns a mapping from each metric name to its statistics dict.
+        'mean', 'variance', 'var_between', 'var_within', 'quantiles', 'y_means',
+        'y_vars'.
+        If multiple metrics, returns a mapping from each metric name to its statistics
+        dict.
 
     Raises
     ------
@@ -121,7 +125,7 @@ def perform_monte_carlo_uq(
         flatten = len(metrics_list) == 1
 
     X = sample_input(n_samples)
-    expected_shape = (n_samples, surrogate.problem["num_vars"])  # type: ignore[index]
+    expected_shape = (n_samples, surrogate.problem["num_vars"])
     if X.shape != expected_shape:
         raise ValueError("sample_input returned array of wrong shape")
 

@@ -158,26 +158,3 @@ def summarize_results(
     print(f"\nUQ Result for '{metric}':")
     print(f"  Mean: {mean:.5f}")
     print(f"  95% CI: [{ci['2.5%']:.5f}, {ci['97.5%']:.5f}]")
-
-def uq_variance_bar(
-    uq_result: dict,
-    metric: str,
-    ax: plt.Axes | None = None,
-) -> tuple[plt.Figure, plt.Axes]:
-    if ax is None:
-        fig, ax = plt.subplots(figsize=(10, 10))
-    else:
-        fig = ax.figure
-
-    between = uq_result["var_between"]
-    within  = uq_result["var_within"]
-    ax.bar([0], [between], label="Between‑sample", width=0.6)
-    ax.bar([0], [within],  bottom=[between], label="Emulator", width=0.6)
-
-    ax.set_xticks([0])
-    ax.set_xticklabels([metric])
-    ax.set_ylabel("Variance")
-    ax.set_title(f"Variance breakdown – {metric}")
-    ax.legend()
-    plt.tight_layout()
-    return fig, ax

@@ -138,10 +138,10 @@ class Surrogate:
                 set_nested_attr(proc_copy, self.param_config[name], val)
             try:
                 simulation_results = cadet.simulate(proc_copy)
-                out = extract(simulation_results)  # user function
+                out = extract(simulation_results)
                 for m in self.metrics:
                     raw_results[m].append(float(out[m]))
-            except Exception as exc:  # noqa: BLE001 – broad but logged
+            except Exception as exc:
                 _logger.warning("Simulation failed – setting NaNs: %s", exc)
                 for m in self.metrics:
                     raw_results[m].append(np.nan)

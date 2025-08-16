@@ -59,7 +59,7 @@ class BatchElution(Process):
         system.add_component("B")
 
         langmuir = Langmuir(system)
-        langmuir.is_kinetic = False
+        langmuir.is_kinetic = True
         langmuir.capacity = capacity
         langmuir.adsorption_rate = adsorption_rate
         langmuir.desorption_rate = desorption_rate
@@ -67,7 +67,7 @@ class BatchElution(Process):
         feed = Inlet(system, name="feed")
         feed.c = feed_conc
         eluent = Inlet(system, name="eluent")
-        eluent.c = [0.0, 0.0]
+        eluent.c = [1, 2]
 
         column = LumpedRateModelWithoutPores(system, name="column")
         column.binding_model = langmuir
@@ -76,6 +76,7 @@ class BatchElution(Process):
         column.axial_dispersion = axial_dispersion
         column.total_porosity = porosity
         column.solution_recorder.write_solution_bulk = True
+        column.solution_recorder.write_solution_solid = True
 
         outlet = Outlet(system, name="outlet")
 
@@ -92,9 +93,9 @@ class BatchElution(Process):
 
         Q = 60 / (60 * 1e6)
         self.add_event("feed_on", "flow_sheet.feed.flow_rate", Q)
-        self.add_event("feed_off", "flow_sheet.feed.flow_rate", 0.0)
+        self.add_event("feed_off", "flow_sheet.feed.flow_rate", 8.33e-8)
         self.add_event("eluent_on", "flow_sheet.eluent.flow_rate", Q)
-        self.add_event("eluent_off", "flow_sheet.eluent.flow_rate", 0.0)
+        self.add_event("eluent_off", "flow_sheet.eluent.flow_rate", 8.33e-8)
 
         self.add_duration("feed_duration")
         self.feed_duration.time = feed_duration
