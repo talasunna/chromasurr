@@ -34,13 +34,24 @@ This runs a full workflow using a preconfigured ``BatchElution`` process and gui
 📦 Installation
 ---------------
 
+The recommended way to install is directly from **PyPI**:
+
+.. code-block:: bash
+
+   pip install chromasurr
+
+This pulls the latest stable release.
+
+For the development version (latest from GitHub):
+
 .. code-block:: bash
 
    pip install git+https://github.com/talasunna/chromasurr.git
 
-**Note** – CADET-Core must be installed or compiled on your system. See the `CADET-Core Installation Guide <https://cadet.github.io/master/getting_started/installation_core.html>`_ for details.
+**Note** – CADET-Core must be installed or compiled on your system.  
+See the `CADET-Core Installation Guide <https://cadet.github.io/master/getting_started/installation_core.html>`_ for details.
 
-CADET-Process is automatically installed via pip when installing ``chromasurr``.
+CADET-Process is installed automatically via pip when installing ``chromasurr``.
 
 🛠️ Usage at a glance
 ---------------------
