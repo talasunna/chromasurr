@@ -119,18 +119,25 @@ python<span class="w"> </span>examples/chromasurr_demo.py
 </section>
 <section id="installation">
 <h2>📦 Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
-<p>The recommended way to install is directly from <strong>PyPI</strong>:</p>
+<p>Install <code class="docutils literal notranslate"><span class="pre">chromasurr</span></code> directly from <strong>PyPI</strong>:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>chromasurr
 </pre></div>
 </div>
-<p>This pulls the latest stable release.</p>
-<p>For the development version (latest from GitHub):</p>
+<p>This pulls the latest stable release of the toolkit.</p>
+<p><strong>CADET-Core dependency</strong></p>
+<p><code class="docutils literal notranslate"><span class="pre">chromasurr</span></code> builds on the CADET process simulator.
+While <code class="docutils literal notranslate"><span class="pre">CADET-Process</span></code> is installed automatically via pip, <strong>CADET-Core</strong> must be installed separately, since it provides the simulation backend.</p>
+<p>The recommended way is to install CADET-Core from <strong>conda-forge</strong>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>conda<span class="w"> </span>install<span class="w"> </span>-c<span class="w"> </span>conda-forge<span class="w"> </span>cadet
+</pre></div>
+</div>
+<p>For advanced options (building from source, etc.), see the official
+<a class="reference external" href="https://cadet.github.io/master/getting_started/installation_core.html">CADET-Core Installation Guide</a>.</p>
+<p><strong>Development version</strong></p>
+<p>To install the latest development version directly from GitHub:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>git+https://github.com/talasunna/chromasurr.git
 </pre></div>
 </div>
-<p><strong>Note</strong> – CADET-Core must be installed or compiled on your system.
-See the <a class="reference external" href="https://cadet.github.io/master/getting_started/installation_core.html">CADET-Core Installation Guide</a> for details.</p>
-<p>CADET-Process is installed automatically via pip when installing <code class="docutils literal notranslate"><span class="pre">chromasurr</span></code>.</p>
 </section>
 <section id="usage-at-a-glance">
 <h2>🛠️ Usage at a glance<a class="headerlink" href="#usage-at-a-glance" title="Link to this heading"></a></h2>
